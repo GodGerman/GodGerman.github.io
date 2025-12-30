@@ -1,0 +1,87 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.form-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-block label {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 0.95rem;
+}
+
+.form-block input {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    background: rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    color: var(--ink);
+}
+
+.form-block input::placeholder {
+    color: rgba(148, 163, 184, 0.4);
+}
+
+.form-block input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 0 15px var(--primary-glow);
+}
+
+.form-block input:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+    border-color: transparent;
+    cursor: not-allowed;
+}
+
+.helper {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+}
+
+.check input {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,6 +1,7 @@
 import {
   formatBinaryIp,
   formatIp,
+  isNetworkAddress,
   parseCidrInput,
   parseIp,
   parseMask,
@@ -224,6 +225,17 @@ export function initVlsmCalculator() {
       return;
     }
 
+    if (!isNetworkAddress(parsedBase.ipArr, parsedBase.prefix)) {
+      const baseCidr = computeCidr(parsedBase.ipArr, parsedBase.prefix);
+      setStatus(
+        statusEl,
+        "error",
+        `La IP base no es direccion de red. Usa ${formatIp(baseCidr.network)} /${parsedBase.prefix}.`
+      );
+      toggleResults(resultsEl, emptyEl, false);
+      return;
+    }
+
     const subnets = [];
     const rows = Array.from(rowsBody.querySelectorAll("tr"));
 
@@ -236,7 +248,7 @@ export function initVlsmCalculator() {
       if (!nameValue && !hostValue) return;
 
       const hosts = Number(hostValue);
-      if (!hostValue || Number.isNaN(hosts) || hosts <= 0 || !Number.isInteger(hosts)) {
+      if (!hostValue || Number.isNaN(hosts) || hosts <= 0 || !Number.isSafeInteger(hosts)) {
         setStatus(statusEl, "error", `Hosts invalidos en la fila ${index + 1}.`);
         return;
       }
@@ -328,24 +340,10 @@ export function initTestRunner() {
   });
 }
 
-export function initRevealAnimations() {
-  const items = Array.from(document.querySelectorAll("[data-reveal]"));
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.2 }
-  );
 
-  items.forEach((item) => observer.observe(item));
-}
 
 export function initDefaults() {
   const note = document.getElementById("vlsm-note");
-  note.value = "Se ordena por hosts requeridos de mayor a menor";
+  if (note) note.value = "Se ordena por hosts requeridos de mayor a menor";
 }
+

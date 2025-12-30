@@ -1,0 +1,72 @@
+.btn {
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn.primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn.primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--primary-glow);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn.ghost {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: var(--primary);
+}
+
+.btn.ghost:hover {
+    background: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 15px var(--primary-glow);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.btn.subtle {
+    background: var(--surface-2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+.btn.subtle:hover {
+    background: var(--border);
+    color: var(--ink);
+    border-color: var(--muted);
+}
+
+.btn.danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: var(--error);
+}
+
+.btn.danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 15px var(--error-glow);
+    color: #fff;
+    border-color: var(--error);
+}
+
+/* Active/Focus states */
+.btn:active {
+    transform: translateY(0);
+}

@@ -1,32 +1,37 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Calculadora IP CIDR y VLSM con validaciones, resultados detallados y pruebas basicas.">
+  <meta name="description"
+    content="Calculadora IP CIDR y VLSM con validaciones, resultados detallados y pruebas basicas.">
   <title>Calculadora IP CIDR y VLSM</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
   <div class="page">
-    <header class="site-header" data-reveal>
-      <div class="brand">
+    <header class="site-header">
+      <a href="index.html" class="brand">
         <div class="brand-mark">IP</div>
         <div class="brand-text">
           <span class="brand-title">Calculadora IP</span>
           <span class="brand-subtitle">CIDR + VLSM</span>
         </div>
-      </div>
+      </a>
       <nav class="nav">
-        <a href="#cidr">CIDR</a>
-        <a href="#vlsm">VLSM</a>
-        <a href="#pruebas">Pruebas</a>
-        <a href="#guia">Guia</a>
+        <a href="cidr.html">CIDR</a>
+        <a href="vlsm.html">VLSM</a>
+        <a href="pruebas.html">Pruebas</a>
+        <a href="guia.html">Guia</a>
       </nav>
     </header>
 
     <main>
-      <section class="hero" data-reveal>
+      <section class="hero">
         <div class="hero-content">
           <p class="eyebrow">Calculadora IP orientada a practica academica</p>
           <h1>Subneteo claro, rapido y con resultados verificables.</h1>
@@ -35,8 +40,8 @@
             mascaras y resumenes de espacio. Incluye pruebas basicas y ejemplos listos para usar.
           </p>
           <div class="hero-actions">
-            <a class="btn primary" href="#cidr">Ir a CIDR</a>
-            <a class="btn ghost" href="#vlsm">Ir a VLSM</a>
+            <a class="btn primary" href="cidr.html">Ir a CIDR</a>
+            <a class="btn ghost" href="vlsm.html">Ir a VLSM</a>
           </div>
           <div class="hero-badges">
             <span class="badge">Validacion de IP y mascara</span>
@@ -67,273 +72,6 @@
           <p class="card-note">Ejemplo ilustrativo. Usa los formularios para calcular tu caso.</p>
         </div>
       </section>
-
-      <section id="cidr" class="section" data-reveal>
-        <div class="section-header">
-          <h2>Calculadora CIDR</h2>
-          <p>Ingresa una IP con prefijo o una IP con mascara (prefijo o decimal punteada).</p>
-        </div>
-        <div class="panel grid-two">
-          <form id="cidr-form" class="form">
-            <div class="form-block">
-              <label for="cidr-combined">IP con prefijo (opcional)</label>
-              <input id="cidr-combined" name="cidr-combined" type="text" placeholder="192.168.10.0/24" autocomplete="off">
-              <p class="helper">Si usas este campo, no es necesario completar los de abajo.</p>
-            </div>
-
-            <div class="form-grid">
-              <div class="form-block">
-                <label for="cidr-ip">Direccion IP</label>
-                <input id="cidr-ip" name="cidr-ip" type="text" placeholder="192.168.10.0" autocomplete="off">
-              </div>
-              <div class="form-block">
-                <label for="cidr-mask">Mascara (prefijo o decimal)</label>
-                <input id="cidr-mask" name="cidr-mask" type="text" placeholder="/24 o 255.255.255.0" autocomplete="off">
-              </div>
-            </div>
-
-            <label class="check">
-              <input id="cidr-binary-toggle" type="checkbox">
-              Mostrar representacion binaria
-            </label>
-
-            <div class="form-actions">
-              <button class="btn primary" type="submit">Calcular CIDR</button>
-              <button class="btn ghost" type="button" id="cidr-example">Cargar ejemplo</button>
-              <button class="btn subtle" type="button" id="cidr-clear">Limpiar</button>
-            </div>
-
-            <div id="cidr-status" class="status" role="alert" aria-live="polite"></div>
-          </form>
-
-          <div class="results" id="cidr-results" hidden>
-            <div class="results-header">
-              <h3>Resultados CIDR</h3>
-              <span class="chip" id="cidr-prefix-chip">/24</span>
-            </div>
-            <dl class="result-list">
-              <div class="result-item">
-                <dt>Direccion de red</dt>
-                <dd id="cidr-network">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Rango de hosts</dt>
-                <dd id="cidr-host-range">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Broadcast</dt>
-                <dd id="cidr-broadcast">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Mascara (decimal)</dt>
-                <dd id="cidr-mask-dec">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Mascara (prefijo)</dt>
-                <dd id="cidr-mask-prefix">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Hosts disponibles</dt>
-                <dd id="cidr-hosts">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Total de direcciones</dt>
-                <dd id="cidr-total">-</dd>
-              </div>
-              <div class="result-item">
-                <dt>Wildcard</dt>
-                <dd id="cidr-wildcard">-</dd>
-              </div>
-            </dl>
-
-            <details id="cidr-binary" class="binary" hidden>
-              <summary>Ver representacion binaria</summary>
-              <div class="binary-grid">
-                <div>
-                  <span>IP</span>
-                  <pre id="cidr-bin-ip"></pre>
-                </div>
-                <div>
-                  <span>Mascara</span>
-                  <pre id="cidr-bin-mask"></pre>
-                </div>
-                <div>
-                  <span>Network</span>
-                  <pre id="cidr-bin-network"></pre>
-                </div>
-                <div>
-                  <span>Broadcast</span>
-                  <pre id="cidr-bin-broadcast"></pre>
-                </div>
-              </div>
-            </details>
-          </div>
-
-          <div class="empty" id="cidr-empty">
-            <p>Completa el formulario para ver resultados.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="vlsm" class="section" data-reveal>
-        <div class="section-header">
-          <h2>Calculadora VLSM</h2>
-          <p>Define una red base y una lista de subredes con hosts requeridos.</p>
-        </div>
-
-        <div class="panel">
-          <form id="vlsm-form" class="form">
-            <div class="form-grid">
-              <div class="form-block">
-                <label for="vlsm-base">Red base (IP/prefijo)</label>
-                <input id="vlsm-base" name="vlsm-base" type="text" placeholder="192.168.0.0/24" autocomplete="off" required>
-              </div>
-              <div class="form-block">
-                <label for="vlsm-note">Nota</label>
-                <input id="vlsm-note" type="text" value="Se ordena por hosts requeridos de mayor a menor" disabled>
-              </div>
-            </div>
-
-            <div class="table-wrap">
-              <table class="input-table">
-                <thead>
-                  <tr>
-                    <th>Subred</th>
-                    <th>Hosts requeridos</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="vlsm-rows"></tbody>
-              </table>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn ghost" type="button" id="vlsm-add-row">Agregar subred</button>
-              <button class="btn primary" type="submit">Calcular VLSM</button>
-              <button class="btn ghost" type="button" id="vlsm-example">Cargar ejemplo</button>
-              <button class="btn subtle" type="button" id="vlsm-clear">Limpiar</button>
-            </div>
-
-            <div id="vlsm-status" class="status" role="alert" aria-live="polite"></div>
-          </form>
-
-          <div class="results" id="vlsm-results" hidden>
-            <div class="results-header">
-              <h3>Resultados VLSM</h3>
-              <span class="chip" id="vlsm-base-chip">/24</span>
-            </div>
-
-            <div class="summary-grid">
-              <div class="summary-card">
-                <span>Red base</span>
-                <strong id="vlsm-base-network">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Mascara base</span>
-                <strong id="vlsm-base-mask">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Hosts disponibles</span>
-                <strong id="vlsm-base-hosts">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Direcciones totales</span>
-                <strong id="vlsm-base-total">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Hosts solicitados</span>
-                <strong id="vlsm-requested-hosts">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Direcciones usadas</span>
-                <strong id="vlsm-used-addresses">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Direcciones restantes</span>
-                <strong id="vlsm-remaining-addresses">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Hosts restantes</span>
-                <strong id="vlsm-remaining-hosts">-</strong>
-              </div>
-              <div class="summary-card">
-                <span>Rango restante</span>
-                <strong id="vlsm-remaining-range">-</strong>
-              </div>
-            </div>
-
-            <div class="table-wrap">
-              <table class="results-table">
-                <thead>
-                  <tr>
-                    <th>Subred</th>
-                    <th>Hosts req</th>
-                    <th>Hosts necesarios</th>
-                    <th>Network</th>
-                    <th>Mascara</th>
-                    <th>Rango de hosts</th>
-                    <th>Broadcast</th>
-                    <th>Hosts validos</th>
-                    <th>Desperdicio</th>
-                  </tr>
-                </thead>
-                <tbody id="vlsm-results-body"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="empty" id="vlsm-empty">
-            <p>Agrega subredes y calcula para ver resultados.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="pruebas" class="section" data-reveal>
-        <div class="section-header">
-          <h2>Pruebas unitarias</h2>
-          <p>Verifica conversiones, calculos CIDR y el caso base de VLSM.</p>
-        </div>
-        <div class="panel">
-          <button class="btn primary" id="run-tests" type="button">Ejecutar pruebas</button>
-          <div id="test-results" class="test-results" aria-live="polite"></div>
-          <div class="test-cases">
-            <p><strong>Casos requeridos:</strong></p>
-            <ul>
-              <li>CIDR: 192.168.10.0/24</li>
-              <li>VLSM: base 192.168.0.0/24 con A=100, B=50, C=25, D=10</li>
-              <li>Conversion IP y mascara</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="guia" class="section" data-reveal>
-        <div class="section-header">
-          <h2>Guia rapida</h2>
-          <p>Recordatorios de formulas y pasos de calculo.</p>
-        </div>
-        <div class="panel guide">
-          <div>
-            <h3>CIDR</h3>
-            <ul>
-              <li>Total direcciones: 2^(32 - prefijo)</li>
-              <li>Hosts disponibles: total - 2</li>
-              <li>Network = IP AND mascara</li>
-              <li>Broadcast = Network OR (~mascara)</li>
-            </ul>
-          </div>
-          <div>
-            <h3>VLSM</h3>
-            <ul>
-              <li>Needed = hosts requeridos + 2</li>
-              <li>Ordenar subredes por needed desc</li>
-              <li>mask_bits = 32 - ceil(log2(needed))</li>
-              <li>block_size = 2^(32 - mask_bits)</li>
-              <li>Asignar bloques contiguos y validar limite</li>
-            </ul>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer class="site-footer">
@@ -341,14 +79,7 @@
     </footer>
   </div>
 
-  <template id="vlsm-row-template">
-    <tr>
-      <td><input class="vlsm-name" type="text" placeholder="DeptoA" autocomplete="off"></td>
-      <td><input class="vlsm-hosts" type="number" min="1" placeholder="120" autocomplete="off"></td>
-      <td class="cell-action"><button class="btn ghost danger vlsm-remove" type="button">Quitar</button></td>
-    </tr>
-  </template>
-
   <script type="module" src="js/main.js"></script>
 </body>
+
 </html>

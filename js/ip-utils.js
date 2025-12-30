@@ -4,12 +4,14 @@ export function parseIp(ipStr) {
   if (!ipStr) return null;
   const parts = ipStr.trim().split(".");
   if (parts.length !== 4) return null;
-  const nums = parts.map((part) => {
-    if (part.trim() === "") return NaN;
-    return Number(part);
-  });
-  if (nums.some((num) => Number.isNaN(num))) return null;
-  if (nums.some((num) => num < 0 || num > 255 || !Number.isInteger(num))) return null;
+  const nums = [];
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!/^\d{1,3}$/.test(trimmed)) return null;
+    const value = Number.parseInt(trimmed, 10);
+    if (!Number.isInteger(value) || value < 0 || value > 255) return null;
+    nums.push(value);
+  }
   return nums;
 }
 
@@ -81,7 +83,10 @@ export function parseCidrInput(input) {
   if (!input) return null;
   const trimmed = String(input).trim();
   if (!trimmed.includes("/")) return null;
-  const [ipStr, prefixStr] = trimmed.split("/");
+  const parts = trimmed.split("/");
+  if (parts.length !== 2) return null;
+  const [ipStr, prefixStr] = parts;
+  if (!ipStr.trim() || !prefixStr.trim()) return null;
   const ipArr = parseIp(ipStr);
   const prefix = parsePrefix(prefixStr);
   if (!ipArr || prefix === null) return null;
@@ -90,4 +95,11 @@ export function parseCidrInput(input) {
 
 export function formatBinaryIp(ipArr) {
   return ipArr.map((octet) => octet.toString(2).padStart(8, "0")).join(".");
+}
+
+export function isNetworkAddress(ipArr, prefix) {
+  const maskArr = prefixToMask(prefix);
+  const maskInt = ipToInt(maskArr);
+  const ipInt = ipToInt(ipArr);
+  return (ipInt & maskInt) >>> 0 === ipInt >>> 0;
 }

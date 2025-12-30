@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Pruebas unitarias para la Calculadora IP.">
+    <title>Pruebas - Calculadora IP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <div class="page">
+        <header class="site-header">
+            <a href="index.html" class="brand">
+                <div class="brand-mark">IP</div>
+                <div class="brand-text">
+                    <span class="brand-title">Calculadora IP</span>
+                    <span class="brand-subtitle">CIDR + VLSM</span>
+                </div>
+            </a>
+            <nav class="nav">
+                <a href="cidr.html">CIDR</a>
+                <a href="vlsm.html">VLSM</a>
+                <a href="pruebas.html" class="active">Pruebas</a>
+                <a href="guia.html">Guia</a>
+            </nav>
+        </header>
+
+        <main>
+            <section id="pruebas" class="section active-section">
+                <div class="section-header">
+                    <h2>Pruebas unitarias</h2>
+                    <p>Verifica conversiones, calculos CIDR y el caso base de VLSM.</p>
+                </div>
+                <div class="panel">
+                    <button class="btn primary" id="run-tests" type="button">Ejecutar pruebas</button>
+                    <div id="test-results" class="test-results" aria-live="polite"></div>
+                    <div class="test-cases">
+                        <p><strong>Casos requeridos:</strong></p>
+                        <ul>
+                            <li>CIDR: 192.168.10.0/24</li>
+                            <li>VLSM: base 192.168.0.0/24 con A=100, B=50, C=25, D=10</li>
+                            <li>Conversion IP y mascara</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>Calculadora IP CIDR y VLSM. Proyecto academico.</p>
+        </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

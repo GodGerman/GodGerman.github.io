@@ -1,0 +1,65 @@
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.input-table,
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 680px;
+}
+
+.input-table th,
+.input-table td,
+.results-table th,
+.results-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.input-table tr:last-child td,
+.results-table tr:last-child td {
+    border-bottom: none;
+}
+
+.input-table input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    font-family: var(--font-sans);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--ink);
+    transition: all 0.2s;
+}
+
+.input-table input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.input-table th,
+.results-table th {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.cell-action {
+    text-align: right;
+    width: 100px;
+}
+
+/* Hover effect on table rows */
+.results-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
