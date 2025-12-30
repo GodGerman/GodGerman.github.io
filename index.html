@@ -1,476 +1,354 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Website Title -->
-    <title>Calcula tu Huella Hidrica</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- Styles -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:500,700&display=swap&subset=latin-ext"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600&display=swap&subset=latin-ext"
-        rel="stylesheet">
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/fontawesome-all.css" rel="stylesheet">
-    <link href="css/swiper.css" rel="stylesheet">
-    <link href="css/magnific-popup.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
-    <!-- Favicon  -->
-    <link rel="icon" href="images/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Calculadora IP CIDR y VLSM con validaciones, resultados detallados y pruebas basicas.">
+  <title>Calculadora IP CIDR y VLSM</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-
-<body data-spy="scroll" data-target=".fixed-top">
-    <!-- Preloader -->
-    <div class="spinner-wrapper">
-        <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
+<body>
+  <div class="page">
+    <header class="site-header" data-reveal>
+      <div class="brand">
+        <div class="brand-mark">IP</div>
+        <div class="brand-text">
+          <span class="brand-title">Calculadora IP</span>
+          <span class="brand-subtitle">CIDR + VLSM</span>
         </div>
-    </div>
-    <!-- end of preloader -->
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top">
-        <!-- Text Logo -->
-        <a class="navbar-brand logo-text page-scroll" href="index.html">Calculadora de Huella Hídrica</a>
-        <!-- Image Logo -->
-        <a class="navbar-brand logo-image" href="index.html"><img src="images/footprint.png" alt="alternative"></a>
-    </nav> <!-- end of navbar -->
-    <!-- end of navbar -->
-    <!-- Header -->
-    <header id="header" class="header">
-        <div class="header-content">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-container">
-                            <h1>CALCULEMOS NUESTRA HUELLA HÍDRICA</span></h1>
-                            <p class="p-heading p-large">"La huella hídrica es el eco invisible de nuestras elecciones
-                                cotidianas, revelando el impacto que dejamos en el agua del mundo". - Maude Barlow</p>
-                            <a class="btn-solid-lg page-scroll" href="#preguntas">CALCULAR</a>
-                        </div>
-                    </div> <!-- end of col -->
-                </div> <!-- end of row -->
-            </div> <!-- end of container -->
-        </div> <!-- end of header-content -->
-    </header> <!-- end of header -->
-    <!-- end of header -->
-    <!--Preguntas-->
-    <div class="container">
-        <div id="preguntas" class="preguntas-container"></div>
-        <h1>Selecciona una Opción</h1>
-        <form>
-            <h3>1. ¿Tipo de regadera que usas?</h3>
-            <ol>
-                <li><input type="radio" name="p1" id="p11"> Regadera Convencional</li>
-                <li><input type="radio" name="p1" id="p12"> Regadera de bajo consumo</li>
-            </ol>
-            <h3>2. ¿Cuanto tiempo te toma ducharte?</h3>
-            <ol>
-                <li><input type="radio" name="p2" id="p21" value="1"> 10 minutos</li>
-                <li><input type="radio" name="p2" id="p22" value="2"> 20 minutos</li>
-                <li><input type="radio" name="p2" id="p23" value="3"> 30 minutos</li>
-                <li><input type="radio" name="p2" id="p24" value="4"> 40 minutos</li>
-            </ol>
-            <h3>3. ¿Cuantas veces a la semana te duchas?</h3>
-            <ol>
-                <li><input type="radio" name="p3" id="p31" value="2"> 2 veces</li>
-                <li><input type="radio" name="p3" id="p32" value="3"> 3 veces</li>
-                <li><input type="radio" name="p3" id="p33" value="4"> 4 veces</li>
-                <li><input type="radio" name="p3" id="p34" value="5"> 5 veces</li>
-            </ol>
-            <h3>4. ¿Cuanto te toma lavarte las manos?</h3>
-            <ol>
-                <li><input type="radio" name="p4" id="p41" value="1"> 1 minuto</li>
-                <li><input type="radio" name="p4" id="p42" value="2"> 2 minutos</li>
-                <li><input type="radio" name="p4" id="p43" value="3"> 3 minutos</li>
-                <li><input type="radio" name="p4" id="p44" value="4"> 4 minutos</li>
-                <li><input type="radio" name="p4" id="p45" value="5"> 5 minutos</li>
-            </ol>
-            <h3>5. ¿Que tipo de inodoro tienes en casa?</h3>
-            <ol>
-                <li><input type="radio" name="p5" id="p51"> Inodoro de descarga completa</li>
-                <li><input type="radio" name="p5" id="p52"> Inodoro de descarga parcial</li>
-            </ol>
-            <h3>6. ¿Aproximadamente cuantas veces al dia usas tu inodoro?</h3>
-            <ol>
-                <li><input type="radio" name="p6" id="p61" value="1"> 1 vez</li>
-                <li><input type="radio" name="p6" id="p62" value="2"> 2 veces</li>
-                <li><input type="radio" name="p6" id="p63" value="3"> 3 veces</li>
-                <li><input type="radio" name="p6" id="p64" value="4"> 4 veces</li>
-            </ol>
-            <h3>7. ¿Lavas tu ropa a mano o en lavadora?</h3>
-            <ol>
-                <li><input type="radio" name="p7" id="p71"> Lavado a mano</li>
-                <li><input type="radio" name="p7" id="p72"> Lavado en lavadora</li>
-            </ol>
-            <h3>8. ¿Cuentas veces a la semana lavas tu ropa?</h3>
-            <ol>
-                <li><input type="radio" name="p8" id="p81" value="1"> 1 vez</li>
-                <li><input type="radio" name="p8" id="p82" value="2"> 2 veces</li>
-                <li><input type="radio" name="p8" id="p83" value="3"> 3 veces</li>
-                <li><input type="radio" name="p8" id="p84" value="4"> 4 veces</li>
-            </ol>
-            <h3>9. ¿Como realizas el lavado de trastes sucios?</h3>
-            <ol>
-                <li><input type="radio" name="p9" id="p91"> Lavado a mano</li>
-                <li><input type="radio" name="p9" id="p92"> Lavado con lavavajillas</li>
-            </ol>
-            <h3>10. ¿Cuantas veces a la semana preparas tu comida?</h3>
-            <ol>
-                <li><input type="radio" name="p10" id="p101" value="1"> 1 vez por semana</li>
-                <li><input type="radio" name="p10" id="p102" value="2"> 2 veces por semana</li>
-                <li><input type="radio" name="p10" id="p103" value="3"> 3 veces por semana</li>
-                <li><input type="radio" name="p10" id="p104" value="4"> 4 veces por semana</li>
-                <li><input type="radio" name="p10" id="p105" value="5"> 5 veces por semana</li>
-            </ol>
-            <h3>11. ¿Cuantas veces a la semana riegas tu jardín?</h3>
-            <ol>
-                <li><input type="radio" name="p11" id="p111" value="1"> 1 vez por semana</li>
-                <li><input type="radio" name="p11" id="p112" value="3"> 3 veces por semana</li>
-                <li><input type="radio" name="p11" id="p113" value="5"> 5 veces por semana</li>
-                <li><input type="radio" name="p11" id="p114" value="0"> No tengo jardín</li>
-            </ol>
-            <h3>12. ¿Cuantas veces a la semana lavas tu automóvil?</h3>
-            <ol>
-                <li><input type="radio" name="p12" id="p121" value="1"> 1 vez por semana</li>
-                <li><input type="radio" name="p12" id="p122" value="3"> 3 veces por semana</li>
-                <li><input type="radio" name="p12" id="p123" value="5"> 5 veces por semana</li>
-                <li><input type="radio" name="p12" id="p124" value="0"> No tengo automóvil</li>
-            </ol>
-            <h3>13. ¿Cuentas con una piscina?</h3>
-            <ol>
-                <li><input type="radio" name="p13" id="p131"> Si</li>
-                <li><input type="radio" name="p13" id="p132"> No</li>
-            </ol>
-            <h3>14. ¿Cuantos Kg de carne de res consumes al mes?</h3>
-            <ol>
-                <li><input type="radio" name="p14" id="p141" value="2"> 2 Kg</li>
-                <li><input type="radio" name="p14" id="p142" value="4"> 4 Kg</li>
-                <li><input type="radio" name="p14" id="p143" value="6"> 6 Kg</li>
-                <li><input type="radio" name="p14" id="p144" value="8"> 8 Kg</li>
-                <li><input type="radio" name="p14" id="p145" value="10"> 10 Kg</li>
-                <li><input type="radio" name="p14" id="p146" value="0"> No consumo carne de res</li>
-            </ol>
-            <h3>15. ¿Cuantos Kg de carne de ternera consumes al mes?</h3>
-            <ol>
-                <li><input type="radio" name="p15" id="p151" value="2"> 2 Kg</li>
-                <li><input type="radio" name="p15" id="p152" value="4"> 4 Kg</li>
-                <li><input type="radio" name="p15" id="p153" value="6"> 6 Kg</li>
-                <li><input type="radio" name="p15" id="p154" value="8"> 8 Kg</li>
-                <li><input type="radio" name="p15" id="p155" value="10"> 10 Kg</li>
-                <li><input type="radio" name="p15" id="p156" value="0"> No consumo carne de ternera</li>
-            </ol>
-            <h3>16. ¿Cuantos Kg de carne de cerdo consumes al mes?</h3>
-            <ol>
-                <li><input type="radio" name="p16" id="p161" value="2"> 2 Kg</li>
-                <li><input type="radio" name="p16" id="p162" value="4"> 4 Kg</li>
-                <li><input type="radio" name="p16" id="p163" value="6"> 6 Kg</li>
-                <li><input type="radio" name="p16" id="p164" value="8"> 8 Kg</li>
-                <li><input type="radio" name="p16" id="p165" value="10"> 10 Kg</li>
-                <li><input type="radio" name="p16" id="p166" value="0"> No consumo carne de cerdo</li>
-            </ol>
-            <h3>17. ¿Cuantos Kg de carne de pollo consumes al mes?</h3>
-            <ol>
-                <li><input type="radio" name="p17" id="p171" value="2"> 2 Kg</li>
-                <li><input type="radio" name="p17" id="p172" value="4"> 4 Kg</li>
-                <li><input type="radio" name="p17" id="p173" value="6"> 6 Kg</li>
-                <li><input type="radio" name="p17" id="p174" value="8"> 8 Kg</li>
-                <li><input type="radio" name="p17" id="p175" value="10"> 10 Kg</li>
-                <li><input type="radio" name="p17" id="p176" value="0"> No consumo carne de pollo</li>
-            </ol>
-            <h3>18. ¿Cual es tu consumo de frutas y verduras al mes?</h3>
-            <div class="row mb-3">
-                <label for="p181" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Papa</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p181"
-                        placeholder="Escribe aquí la cantidad de papas que consumes.">
-                </div>
-                <label for="p182" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Manzana</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p182"
-                        placeholder="Escribe aquí la cantidad de manzanas que consumes.">
-                </div>
-                <label for="p183" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Jitomate</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p183"
-                        placeholder="Escribe aquí la cantidad de jitomates que consumes.">
-                </div>
-                <label for="p184" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Naranja</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p184"
-                        placeholder="Escribe aquí la cantidad de naranjas que consumes.">
-                </div>
-                <label for="p185" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Plátano</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p185"
-                        placeholder="Escribe aquí la cantidad de plátanos que consumes.">
-                </div>
-                <label for="p186" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5> Lechuga</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p186"
-                        placeholder="Escribe aquí la cantidad de lechuga en Kg que consumes.">
-                </div>
-            </div>
-            <h3>19. ¿Cual es tu consumo de bebidas al mes?</h3>
-            <div class="row mb-3">
-                <label for="p191" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Refrescos</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p191"
-                        placeholder="Escribe aquí los litros de refresco que consumes.">
-                </div>
-                <label for="p192" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Cerveza</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p192"
-                        placeholder="Escribe aquí los vasos de cerveza que consumes.">
-                </div>
-                <label for="p193" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Leche</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p193"
-                        placeholder="Escribe aquí los vasos de leche que consumes.">
-                </div>
-                <label for="p194" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Té</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p194"
-                        placeholder="Escribe aquí las tazas de té que consumes.">
-                </div>
-                <label for="p195" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Vino</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p195"
-                        placeholder="Escribe aquí las copas de vino que consumes.">
-                </div>
-                <label for="p196" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Jugo de Manzana</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p196"
-                        placeholder="Escribe aquí los vasos de jugo de manzana que consumes.">
-                </div>
-                <label for="p197" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Jugo de Naranja</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p197"
-                        placeholder="Escribe aquí los vasos de jugo de naranja que consumes.">
-                </div>
-                <label for="p198" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Café</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p198"
-                        placeholder="Escribe aquí las tazas de café que consumes.">
-                </div>
-            </div>
-            <h3>20. ¿Cual es tu consumo de los siguientes alimentos variados al mes?</h3>
-            <div class="row mb-3">
-                <label for="p201" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Hamburguesa</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p201"
-                        placeholder="Escribe aquí el numero de hamburguesas que consumes.">
-                </div>
-                <label for="p202" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Papas Fritas</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p202"
-                        placeholder="Escribe aquí el numero de bolsas de papas fritas que consumes.">
-                </div>
-                <label for="p203" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Barras de Chocolate</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p203"
-                        placeholder="Escribe aquí el numero de barras de chocolate de 100gr que consumes.">
-                </div>
-                <label for="p204" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Azúcar Refinada</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p204"
-                        placeholder="Escribe aquí la cantidad de azúcar refinada en Kg que consumes.">
-                </div>
-                <label for="p205" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Mantequilla</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p205"
-                        placeholder="Escribe aquí la cantidad de mantequilla en Kg que consumes.">
-                </div>
-                <label for="p206" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Queso</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p206"
-                        placeholder="Escribe aquí la cantidad de queso en Kg que consumes.">
-                </div>
-                <label for="p207" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Pan</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p207"
-                        placeholder="Escribe aquí el número de rebanadas de pan que consumes.">
-                </div>
-                <label for="p208" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Huevo</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p208"
-                        placeholder="Escribe aquí la cantidad de huevos que consumes.">
-                </div>
-                <label for="p209" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Arroz</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p209"
-                        placeholder="Escribe aquí la cantidad de arroz en Kg que consumes.">
-                </div>
-            </div>
-            <h3>21. ¿Cantidad de ropa y calzado que posees?</h3>
-            <div class="row mb-3">
-                <label for="p211" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Playeras de Algodón</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p211"
-                        placeholder="Escribe aquí la cantidad playeras de algodón que posees.">
-                </div>
-                <label for="p212" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Par de pantalones de mezclilla</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p212"
-                        placeholder="Escribe aquí la cantidad de pantalones de mezclilla que posees.">
-                </div>
-                <label for="p213" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Zapatos de Piel</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p213"
-                        placeholder="Escribe aquí la cantidad de zapatos de piel que posees.">
-                </div>
-            </div>
-            <h3>22. Otros artículos de uso</h3>
-            <div class="row mb-3">
-                <label for="p221" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Hojas de papel tamaño A4</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p221"
-                        placeholder="Escribe aquí la cantidad de hojas tamaño A4 que usas en un mes">
-                </div>
-                <label for="p222" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Libreta</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p222"
-                        placeholder="Escribe aquí la cantidad de libretas que usas en un mes">
-                </div>
-                <label for="p222" class="col-sm-2 col-form-label col-form-label-sm">
-                    <h5>Libros</h5>
-                </label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control form-control-sm" id="p223"
-                        placeholder="Escribe aquí la cantidad de libros que compras en un mes">
-                </div>
-            </div>
-            <a class="btn-solid-cal" onclick="water()" href="#callMeForm">CALCULAR</a>
-        </form>
-    </div>
-    <!-- Call Me -->
-    <div id="callMe" class="form-1">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="text-container">
-                        <div class="section-title">DATOS</div>
-                        <h2 class="white">Envíanos tu Resultado</h2>
-                        <p class="white">Estos datos pueden ser de gran utilidad para tener un mejor conocimiento sobre
-                            los consumos de agua!</p>
-                    </div>
-                </div> <!-- end of col -->
-                <div class="col-lg-6">
-                    <!-- Call Me Form -->
-                    <form id="callMeForm" data-toggle="validator" data-focus="false">
-                        <div class="form-group">
-                            <input type="text" class="form-control-input" id="lname" name="lname" required>
-                            <label class="label-control" for="lname">Nombre</label>
-                            <div class="help-block with-errors"></div>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control-input" id="lemail" name="lemail" required>
-                            <label class="label-control" for="lemail">Email</label>
-                            <div class="help-block with-errors"></div>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-control-select" id="lselect" required>
-                                <option class="select-option" value="" disabled selected>Ocupación</option>
-                                <option class="select-option" value="Estudiante">Estudiante</option>
-                                <option class="select-option" value="Profesor">Profesor</option>
-                                <option class="select-option" value="Ninguno">Ninguno</option>
-                            </select>
-                            <div class="help-block with-errors"></div>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control-input" id="lhuella" name="lhuella" readonly required>
-                            <label class="label-control" for="lhuella"></label>
-                            <div class="help-block with-errors"></div>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="form-control-submit-button" onclick="sendDB()">ENVIAR</button>
-                        </div>
-                        <div class="form-message">
-                            <div id="lmsgSubmit" class="h3 text-center hidden"></div>
-                        </div>
-                    </form>
-                    <!-- end of call me form -->
-                </div> <!-- end of col -->
-            </div> <!-- end of row -->
-        </div> <!-- end of container -->
-    </div> <!-- end of form-1 -->
-    <!-- end of call me -->
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="js/jquery.min.js"></script> <!-- jQuery for Bootstrap's JavaScript plugins -->
-    <script src="js/popper.min.js"></script> <!-- Popper tooltip library for Bootstrap -->
-    <script src="js/bootstrap.min.js"></script> <!-- Bootstrap framework -->
-    <script src="js/jquery.easing.min.js"></script> <!-- jQuery Easing for smooth scrolling between anchors -->
-    <script src="js/swiper.min.js"></script> <!-- Swiper for image and text sliders -->
-    <script src="js/jquery.magnific-popup.js"></script> <!-- Magnific Popup for lightboxes -->
-    <script src="js/morphext.min.js"></script> <!-- Morphtext rotating text in the header -->
-    <script src="js/isotope.pkgd.min.js"></script> <!-- Isotope for filter -->
-    <script src="js/validator.min.js"></script> <!-- Validator.js - Bootstrap plugin that validates forms -->
-    <script src="js/scripts.js"></script> <!-- Custom scripts -->
-    <script src="js/water-footprint.js"></script> <!-- Water Footprint Calculations -->
-</body>
+      </div>
+      <nav class="nav">
+        <a href="#cidr">CIDR</a>
+        <a href="#vlsm">VLSM</a>
+        <a href="#pruebas">Pruebas</a>
+        <a href="#guia">Guia</a>
+      </nav>
+    </header>
 
+    <main>
+      <section class="hero" data-reveal>
+        <div class="hero-content">
+          <p class="eyebrow">Calculadora IP orientada a practica academica</p>
+          <h1>Subneteo claro, rapido y con resultados verificables.</h1>
+          <p class="hero-copy">
+            Calcula redes CIDR y asignaciones VLSM con validaciones estrictas, rangos de host,
+            mascaras y resumenes de espacio. Incluye pruebas basicas y ejemplos listos para usar.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#cidr">Ir a CIDR</a>
+            <a class="btn ghost" href="#vlsm">Ir a VLSM</a>
+          </div>
+          <div class="hero-badges">
+            <span class="badge">Validacion de IP y mascara</span>
+            <span class="badge">Resultados detallados</span>
+            <span class="badge">Pruebas integradas</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="card-title">Vista previa de resultados</div>
+          <div class="card-grid">
+            <div>
+              <span class="card-label">Network</span>
+              <span class="card-value mono">192.168.10.0/24</span>
+            </div>
+            <div>
+              <span class="card-label">Hosts</span>
+              <span class="card-value">254</span>
+            </div>
+            <div>
+              <span class="card-label">Broadcast</span>
+              <span class="card-value mono">192.168.10.255</span>
+            </div>
+            <div>
+              <span class="card-label">Mascara</span>
+              <span class="card-value mono">255.255.255.0</span>
+            </div>
+          </div>
+          <p class="card-note">Ejemplo ilustrativo. Usa los formularios para calcular tu caso.</p>
+        </div>
+      </section>
+
+      <section id="cidr" class="section" data-reveal>
+        <div class="section-header">
+          <h2>Calculadora CIDR</h2>
+          <p>Ingresa una IP con prefijo o una IP con mascara (prefijo o decimal punteada).</p>
+        </div>
+        <div class="panel grid-two">
+          <form id="cidr-form" class="form">
+            <div class="form-block">
+              <label for="cidr-combined">IP con prefijo (opcional)</label>
+              <input id="cidr-combined" name="cidr-combined" type="text" placeholder="192.168.10.0/24" autocomplete="off">
+              <p class="helper">Si usas este campo, no es necesario completar los de abajo.</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="cidr-ip">Direccion IP</label>
+                <input id="cidr-ip" name="cidr-ip" type="text" placeholder="192.168.10.0" autocomplete="off">
+              </div>
+              <div class="form-block">
+                <label for="cidr-mask">Mascara (prefijo o decimal)</label>
+                <input id="cidr-mask" name="cidr-mask" type="text" placeholder="/24 o 255.255.255.0" autocomplete="off">
+              </div>
+            </div>
+
+            <label class="check">
+              <input id="cidr-binary-toggle" type="checkbox">
+              Mostrar representacion binaria
+            </label>
+
+            <div class="form-actions">
+              <button class="btn primary" type="submit">Calcular CIDR</button>
+              <button class="btn ghost" type="button" id="cidr-example">Cargar ejemplo</button>
+              <button class="btn subtle" type="button" id="cidr-clear">Limpiar</button>
+            </div>
+
+            <div id="cidr-status" class="status" role="alert" aria-live="polite"></div>
+          </form>
+
+          <div class="results" id="cidr-results" hidden>
+            <div class="results-header">
+              <h3>Resultados CIDR</h3>
+              <span class="chip" id="cidr-prefix-chip">/24</span>
+            </div>
+            <dl class="result-list">
+              <div class="result-item">
+                <dt>Direccion de red</dt>
+                <dd id="cidr-network">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Rango de hosts</dt>
+                <dd id="cidr-host-range">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Broadcast</dt>
+                <dd id="cidr-broadcast">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Mascara (decimal)</dt>
+                <dd id="cidr-mask-dec">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Mascara (prefijo)</dt>
+                <dd id="cidr-mask-prefix">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Hosts disponibles</dt>
+                <dd id="cidr-hosts">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Total de direcciones</dt>
+                <dd id="cidr-total">-</dd>
+              </div>
+              <div class="result-item">
+                <dt>Wildcard</dt>
+                <dd id="cidr-wildcard">-</dd>
+              </div>
+            </dl>
+
+            <details id="cidr-binary" class="binary" hidden>
+              <summary>Ver representacion binaria</summary>
+              <div class="binary-grid">
+                <div>
+                  <span>IP</span>
+                  <pre id="cidr-bin-ip"></pre>
+                </div>
+                <div>
+                  <span>Mascara</span>
+                  <pre id="cidr-bin-mask"></pre>
+                </div>
+                <div>
+                  <span>Network</span>
+                  <pre id="cidr-bin-network"></pre>
+                </div>
+                <div>
+                  <span>Broadcast</span>
+                  <pre id="cidr-bin-broadcast"></pre>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <div class="empty" id="cidr-empty">
+            <p>Completa el formulario para ver resultados.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="vlsm" class="section" data-reveal>
+        <div class="section-header">
+          <h2>Calculadora VLSM</h2>
+          <p>Define una red base y una lista de subredes con hosts requeridos.</p>
+        </div>
+
+        <div class="panel">
+          <form id="vlsm-form" class="form">
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="vlsm-base">Red base (IP/prefijo)</label>
+                <input id="vlsm-base" name="vlsm-base" type="text" placeholder="192.168.0.0/24" autocomplete="off" required>
+              </div>
+              <div class="form-block">
+                <label for="vlsm-note">Nota</label>
+                <input id="vlsm-note" type="text" value="Se ordena por hosts requeridos de mayor a menor" disabled>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="input-table">
+                <thead>
+                  <tr>
+                    <th>Subred</th>
+                    <th>Hosts requeridos</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="vlsm-rows"></tbody>
+              </table>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn ghost" type="button" id="vlsm-add-row">Agregar subred</button>
+              <button class="btn primary" type="submit">Calcular VLSM</button>
+              <button class="btn ghost" type="button" id="vlsm-example">Cargar ejemplo</button>
+              <button class="btn subtle" type="button" id="vlsm-clear">Limpiar</button>
+            </div>
+
+            <div id="vlsm-status" class="status" role="alert" aria-live="polite"></div>
+          </form>
+
+          <div class="results" id="vlsm-results" hidden>
+            <div class="results-header">
+              <h3>Resultados VLSM</h3>
+              <span class="chip" id="vlsm-base-chip">/24</span>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-card">
+                <span>Red base</span>
+                <strong id="vlsm-base-network">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Mascara base</span>
+                <strong id="vlsm-base-mask">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Hosts disponibles</span>
+                <strong id="vlsm-base-hosts">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Direcciones totales</span>
+                <strong id="vlsm-base-total">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Hosts solicitados</span>
+                <strong id="vlsm-requested-hosts">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Direcciones usadas</span>
+                <strong id="vlsm-used-addresses">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Direcciones restantes</span>
+                <strong id="vlsm-remaining-addresses">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Hosts restantes</span>
+                <strong id="vlsm-remaining-hosts">-</strong>
+              </div>
+              <div class="summary-card">
+                <span>Rango restante</span>
+                <strong id="vlsm-remaining-range">-</strong>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th>Subred</th>
+                    <th>Hosts req</th>
+                    <th>Hosts necesarios</th>
+                    <th>Network</th>
+                    <th>Mascara</th>
+                    <th>Rango de hosts</th>
+                    <th>Broadcast</th>
+                    <th>Hosts validos</th>
+                    <th>Desperdicio</th>
+                  </tr>
+                </thead>
+                <tbody id="vlsm-results-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="empty" id="vlsm-empty">
+            <p>Agrega subredes y calcula para ver resultados.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="pruebas" class="section" data-reveal>
+        <div class="section-header">
+          <h2>Pruebas unitarias</h2>
+          <p>Verifica conversiones, calculos CIDR y el caso base de VLSM.</p>
+        </div>
+        <div class="panel">
+          <button class="btn primary" id="run-tests" type="button">Ejecutar pruebas</button>
+          <div id="test-results" class="test-results" aria-live="polite"></div>
+          <div class="test-cases">
+            <p><strong>Casos requeridos:</strong></p>
+            <ul>
+              <li>CIDR: 192.168.10.0/24</li>
+              <li>VLSM: base 192.168.0.0/24 con A=100, B=50, C=25, D=10</li>
+              <li>Conversion IP y mascara</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="guia" class="section" data-reveal>
+        <div class="section-header">
+          <h2>Guia rapida</h2>
+          <p>Recordatorios de formulas y pasos de calculo.</p>
+        </div>
+        <div class="panel guide">
+          <div>
+            <h3>CIDR</h3>
+            <ul>
+              <li>Total direcciones: 2^(32 - prefijo)</li>
+              <li>Hosts disponibles: total - 2</li>
+              <li>Network = IP AND mascara</li>
+              <li>Broadcast = Network OR (~mascara)</li>
+            </ul>
+          </div>
+          <div>
+            <h3>VLSM</h3>
+            <ul>
+              <li>Needed = hosts requeridos + 2</li>
+              <li>Ordenar subredes por needed desc</li>
+              <li>mask_bits = 32 - ceil(log2(needed))</li>
+              <li>block_size = 2^(32 - mask_bits)</li>
+              <li>Asignar bloques contiguos y validar limite</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Calculadora IP CIDR y VLSM. Proyecto academico.</p>
+    </footer>
+  </div>
+
+  <template id="vlsm-row-template">
+    <tr>
+      <td><input class="vlsm-name" type="text" placeholder="DeptoA" autocomplete="off"></td>
+      <td><input class="vlsm-hosts" type="number" min="1" placeholder="120" autocomplete="off"></td>
+      <td class="cell-action"><button class="btn ghost danger vlsm-remove" type="button">Quitar</button></td>
+    </tr>
+  </template>
+
+  <script type="module" src="js/main.js"></script>
+</body>
 </html>
