@@ -1,4 +1,5 @@
-.table-wrap {
+.table-wrap,
+.table-container {
     width: 100%;
     overflow-x: auto;
     border-radius: var(--radius);
@@ -7,24 +8,11 @@
 }
 
 .input-table,
-.results-table {
+.results-table,
+.data-table {
     width: 100%;
     border-collapse: collapse;
     min-width: 680px;
-}
-
-.input-table th,
-.input-table td,
-.results-table th,
-.results-table td {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-}
-
-.input-table tr:last-child td,
-.results-table tr:last-child td {
-    border-bottom: none;
 }
 
 .input-table input {
@@ -45,13 +33,37 @@
 }
 
 .input-table th,
-.results-table th {
-    background: rgba(255, 255, 255, 0.03);
+.input-table td,
+.results-table th,
+.results-table td,
+.data-table th,
+.data-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Softer border */
+    text-align: left;
+    vertical-align: middle;
+}
+
+.input-table tr:last-child td,
+.results-table tr:last-child td,
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.input-table th,
+.results-table th,
+.data-table th {
+    background: rgba(0, 0, 0, 0.3);
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-weight: 700;
     color: var(--muted);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(4px);
+    text-align: center;
 }
 
 .cell-action {
@@ -59,7 +71,14 @@
     width: 100px;
 }
 
-/* Hover effect on table rows */
-.results-table tbody tr:hover {
+/* Zebra striping */
+.results-table tbody tr:nth-child(even),
+.data-table tbody tr:nth-child(even) {
     background: rgba(255, 255, 255, 0.02);
+}
+
+/* Hover effect on table rows */
+.results-table tbody tr:hover,
+.data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
 }

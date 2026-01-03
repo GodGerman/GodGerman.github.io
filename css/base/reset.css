@@ -40,3 +40,16 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--muted);
 }
+
+/* Global Reset for Number Inputs */
+input[type="number"] {
+    -webkit-appearance: textfield !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}

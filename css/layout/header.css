@@ -23,18 +23,12 @@
     color: var(--ink);
 }
 
-.brand-mark {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff;
-    display: grid;
-    place-items: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 10px var(--primary-glow);
+.brand-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    /* Optional shadow if PNG needs pop */
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
 }
 
 .brand-text {
@@ -56,6 +50,16 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.header-credits {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.4;
+    max-width: 300px;
+    margin: 0 16px;
 }
 
 .nav {
@@ -99,6 +103,12 @@
         padding-bottom: 16px;
         gap: 16px;
         background: rgba(11, 12, 21, 0.95);
+    }
+
+    .header-credits {
+        max-width: 100%;
+        margin: 0;
+        font-size: 0.75rem;
     }
 
     .nav {

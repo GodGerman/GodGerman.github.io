@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description"
-    content="Calculadora IP CIDR y VLSM con validaciones, resultados detallados y pruebas basicas.">
-  <title>Calculadora IP CIDR y VLSM</title>
+  <meta name="description" content="Calculadora CIDR con validaciones y resultados detallados.">
+  <title>Calculadora IP</title>
+  <link rel="icon" type="image/x-icon" href="img/icono.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="css/main.css">
@@ -16,67 +16,178 @@
   <div class="page">
     <header class="site-header">
       <a href="index.html" class="brand">
-        <div class="brand-mark">IP</div>
+        <img src="img/logo.png" alt="Logo" class="brand-logo">
         <div class="brand-text">
           <span class="brand-title">Calculadora IP</span>
           <span class="brand-subtitle">CIDR + VLSM</span>
         </div>
       </a>
+      <div class="header-credits">
+        Aguilar Bautista César Fernando<br>Ramos Ortiz Ximena Abigail
+      </div>
       <nav class="nav">
-        <a href="cidr.html">CIDR</a>
+        <a href="index.html" class="active">CIDR</a>
         <a href="vlsm.html">VLSM</a>
-        <a href="pruebas.html">Pruebas</a>
-        <a href="guia.html">Guia</a>
       </nav>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="hero-content">
-          <p class="eyebrow">Calculadora IP orientada a practica academica</p>
-          <h1>Subneteo claro, rapido y con resultados verificables.</h1>
-          <p class="hero-copy">
-            Calcula redes CIDR y asignaciones VLSM con validaciones estrictas, rangos de host,
-            mascaras y resumenes de espacio. Incluye pruebas basicas y ejemplos listos para usar.
+      <section id="cidr" class="section active-section">
+        <div class="section-header">
+          <h2>Calculadora CIDR</h2>
+          <p>Analiza redes IPv4, obtén rangos de hosts, conversiones binarias y genera subredes de longitud fija (FLSM).
           </p>
-          <div class="hero-actions">
-            <a class="btn primary" href="cidr.html">Ir a CIDR</a>
-            <a class="btn ghost" href="vlsm.html">Ir a VLSM</a>
+        </div>
+        <div class="panel">
+          <form id="cidr-form" class="form">
+            <div class="form-block">
+              <label for="cidr-combined">IP con prefijo (opcional)</label>
+              <input id="cidr-combined" name="cidr-combined" type="text" placeholder="192.168.10.0/24"
+                autocomplete="off">
+              <p class="helper">Si usas este campo, no es necesario completar los de abajo.</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="cidr-ip">Direccion IP</label>
+                <input id="cidr-ip" name="cidr-ip" type="text" placeholder="192.168.10.0" autocomplete="off">
+              </div>
+              <div class="form-block">
+                <label for="cidr-mask">Mascara (prefijo o decimal)</label>
+                <input id="cidr-mask" name="cidr-mask" type="text" placeholder="/24 o 255.255.255.0" autocomplete="off">
+              </div>
+              <div class="form-block">
+                <label for="cidr-subnets">Subredes (opcional)</label>
+                <input id="cidr-subnets" name="cidr-subnets" type="number" min="1" placeholder="Ej: 4, 8, 256..."
+                  autocomplete="off">
+              </div>
+            </div>
+
+            <label class="check">
+              <input id="cidr-binary-toggle" type="checkbox">
+              Mostrar representacion binaria
+            </label>
+
+            <div class="form-actions">
+              <button class="btn primary" type="submit">Calcular CIDR</button>
+              <button class="btn ghost" type="button" id="cidr-example">Cargar ejemplo</button>
+              <button class="btn subtle" type="button" id="cidr-clear">Limpiar</button>
+            </div>
+
+            <div id="cidr-status" class="status" role="alert" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="results panel" id="cidr-results" hidden style="margin-top: 24px;">
+          <div class="results-header">
+            <h3>Resultados CIDR</h3>
+            <span class="chip" id="cidr-prefix-chip">/24</span>
           </div>
-          <div class="hero-badges">
-            <span class="badge">Validacion de IP y mascara</span>
-            <span class="badge">Resultados detallados</span>
-            <span class="badge">Pruebas integradas</span>
+          <dl class="result-list">
+            <div class="result-item">
+              <dt>Direccion de red</dt>
+              <dd id="cidr-network">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Rango de hosts</dt>
+              <dd id="cidr-host-range">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Broadcast</dt>
+              <dd id="cidr-broadcast">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Mascara (decimal)</dt>
+              <dd id="cidr-mask-dec">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Mascara (prefijo)</dt>
+              <dd id="cidr-mask-prefix">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Hosts disponibles</dt>
+              <dd id="cidr-hosts">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Total de direcciones</dt>
+              <dd id="cidr-total">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Wildcard</dt>
+              <dd id="cidr-wildcard">-</dd>
+            </div>
+          </dl>
+
+          <details id="cidr-binary" class="binary" hidden>
+            <summary>Ver representacion binaria</summary>
+            <div class="binary-grid">
+              <div>
+                <span>IP</span>
+                <pre id="cidr-bin-ip"></pre>
+              </div>
+              <div>
+                <span>Mascara</span>
+                <pre id="cidr-bin-mask"></pre>
+              </div>
+              <div>
+                <span>Network</span>
+                <pre id="cidr-bin-network"></pre>
+              </div>
+              <div>
+                <span>Broadcast</span>
+                <pre id="cidr-bin-broadcast"></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+
+
+
+
+
+        <div class="results panel" id="cidr-subnet-results" hidden style="margin-top: 24px;">
+          <div class="results-header">
+            <h3>Subredes Generadas</h3>
+            <span class="chip" id="cidr-subnet-count-chip">0</span>
+          </div>
+          <div class="result-list subnet-summary">
+            <div class="result-item">
+              <dt>Nueva Mascara</dt>
+              <dd id="cidr-new-mask">-</dd>
+            </div>
+            <div class="result-item">
+              <dt>Hosts por Subred</dt>
+              <dd id="cidr-subnet-hosts">-</dd>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>IP Red</th>
+                  <th>IP Inicio</th>
+                  <th>IP Final</th>
+                  <th>IP Broadcast</th>
+                  <th>Host Mask</th>
+                </tr>
+              </thead>
+              <tbody id="cidr-subnet-rows">
+                <!-- Rows generated by JS -->
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="hero-card">
-          <div class="card-title">Vista previa de resultados</div>
-          <div class="card-grid">
-            <div>
-              <span class="card-label">Network</span>
-              <span class="card-value mono">192.168.10.0/24</span>
-            </div>
-            <div>
-              <span class="card-label">Hosts</span>
-              <span class="card-value">254</span>
-            </div>
-            <div>
-              <span class="card-label">Broadcast</span>
-              <span class="card-value mono">192.168.10.255</span>
-            </div>
-            <div>
-              <span class="card-label">Mascara</span>
-              <span class="card-value mono">255.255.255.0</span>
-            </div>
-          </div>
-          <p class="card-note">Ejemplo ilustrativo. Usa los formularios para calcular tu caso.</p>
+
+        <div class="empty" id="cidr-empty">
+          <p>Ingresa una IP y una mascara para ver resultados.</p>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>Calculadora IP CIDR y VLSM. Proyecto academico.</p>
-    </footer>
+
   </div>
 
   <script type="module" src="js/main.js"></script>

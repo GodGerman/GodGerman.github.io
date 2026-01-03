@@ -15,6 +15,13 @@ export function parseIp(ipStr) {
   return nums;
 }
 
+export function isValidIpArray(ipArr) {
+  if (!Array.isArray(ipArr) || ipArr.length !== 4) return false;
+  return ipArr.every(
+    (octet) => Number.isInteger(octet) && octet >= 0 && octet <= 255
+  );
+}
+
 export function formatIp(ipArr) {
   return ipArr.join(".");
 }
@@ -45,6 +52,7 @@ export function prefixToMask(prefix) {
 }
 
 export function maskToPrefix(maskArr) {
+  if (!isValidIpArray(maskArr)) return null;
   // Accept only contiguous 1s followed by 0s.
   const bitString = maskArr
     .map((octet) => octet.toString(2).padStart(8, "0"))
@@ -60,7 +68,7 @@ export function parsePrefix(input) {
   if (input === null || input === undefined) return null;
   const trimmed = String(input).trim();
   if (!trimmed) return null;
-  const raw = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+  const raw = trimmed.startsWith("/") ? trimmed.slice(1).trim() : trimmed;
   if (!/^\d{1,2}$/.test(raw)) return null;
   const value = Number(raw);
   if (!Number.isInteger(value) || value < 0 || value > 32) return null;
@@ -68,7 +76,7 @@ export function parsePrefix(input) {
 }
 
 export function parseMask(input) {
-  if (!input) return null;
+  if (input === null || input === undefined) return null;
   const trimmed = String(input).trim();
   if (!trimmed) return null;
   if (trimmed.includes(".")) {
@@ -98,7 +106,10 @@ export function formatBinaryIp(ipArr) {
 }
 
 export function isNetworkAddress(ipArr, prefix) {
+  if (!isValidIpArray(ipArr)) return false;
+  if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) return false;
   const maskArr = prefixToMask(prefix);
+  if (!maskArr) return false;
   const maskInt = ipToInt(maskArr);
   const ipInt = ipToInt(ipArr);
   return (ipInt & maskInt) >>> 0 === ipInt >>> 0;

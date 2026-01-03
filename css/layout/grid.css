@@ -1,5 +1,5 @@
 main {
-    padding: 60px 4vw 80px;
+    padding: 24px 4vw 80px;
     flex: 1;
     max-width: 1280px;
     /* Slightly wider */
@@ -73,7 +73,7 @@ main {
 
 .grid-two {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 32px;
 }
 

@@ -5,8 +5,9 @@ import {
   parseCidrInput,
   parseIp,
   parseMask,
+  prefixToMask,
 } from "./ip-utils.js";
-import { computeCidr } from "./cidr.js";
+import { computeCidr, computeSubnets } from "./cidr.js";
 import { computeVlsm } from "./vlsm.js";
 import { runTests } from "./tests.js";
 
@@ -20,9 +21,14 @@ function setStatus(element, type, message) {
   element.setAttribute("data-type", type);
 }
 
-function toggleResults(resultsEl, emptyEl, show) {
-  resultsEl.hidden = !show;
-  emptyEl.hidden = show;
+function parseStrictInt(value) {
+  if (value === null || value === undefined) return null;
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+  if (!/^\d+$/.test(trimmed)) return null;
+  const parsed = Number(trimmed);
+  if (!Number.isSafeInteger(parsed)) return null;
+  return parsed;
 }
 
 export function initCidrCalculator() {
@@ -37,6 +43,7 @@ export function initCidrCalculator() {
   const binaryEl = document.getElementById("cidr-binary");
   const exampleBtn = document.getElementById("cidr-example");
   const clearBtn = document.getElementById("cidr-clear");
+  const subnetsInput = document.getElementById("cidr-subnets");
 
   const fields = {
     network: document.getElementById("cidr-network"),
@@ -54,13 +61,33 @@ export function initCidrCalculator() {
     binBroadcast: document.getElementById("cidr-bin-broadcast"),
   };
 
+  const subnetElements = {
+    container: document.getElementById("cidr-subnet-results"),
+    rows: document.getElementById("cidr-subnet-rows"),
+    chip: document.getElementById("cidr-subnet-count-chip"),
+    newMask: document.getElementById("cidr-new-mask"),
+    subnetHosts: document.getElementById("cidr-subnet-hosts"),
+  };
+
+  let cidrView = "empty";
+
+  function setCidrView(view) {
+    cidrView = view;
+    const showSummary = view === "summary" || view === "subnets";
+    const showSubnets = view === "subnets";
+    resultsEl.hidden = !showSummary;
+    subnetElements.container.hidden = !showSubnets;
+    if (emptyEl) emptyEl.hidden = showSummary || showSubnets;
+    if (binaryEl) binaryEl.hidden = showSummary ? !binaryToggle.checked : true;
+  }
+
   function clearForm() {
     combinedInput.value = "";
     ipInput.value = "";
     maskInput.value = "";
     binaryToggle.checked = false;
-    binaryEl.hidden = true;
-    toggleResults(resultsEl, emptyEl, false);
+    subnetsInput.value = "";
+    setCidrView("empty");
     setStatus(statusEl, null, null);
   }
 
@@ -73,7 +100,8 @@ export function initCidrCalculator() {
   clearBtn.addEventListener("click", clearForm);
 
   binaryToggle.addEventListener("change", () => {
-    binaryEl.hidden = !binaryToggle.checked;
+    const showSummary = cidrView === "summary" || cidrView === "subnets";
+    binaryEl.hidden = showSummary ? !binaryToggle.checked : true;
   });
 
   form.addEventListener("submit", (event) => {
@@ -87,7 +115,7 @@ export function initCidrCalculator() {
       const parsed = parseCidrInput(combinedInput.value);
       if (!parsed) {
         setStatus(statusEl, "error", "Formato CIDR invalido. Usa IP/prefijo.");
-        toggleResults(resultsEl, emptyEl, false);
+        setCidrView("empty");
         return;
       }
       ipArr = parsed.ipArr;
@@ -96,7 +124,7 @@ export function initCidrCalculator() {
       const parsed = parseCidrInput(ipInput.value);
       if (!parsed) {
         setStatus(statusEl, "error", "Formato CIDR invalido en direccion IP.");
-        toggleResults(resultsEl, emptyEl, false);
+        setCidrView("empty");
         return;
       }
       ipArr = parsed.ipArr;
@@ -105,18 +133,23 @@ export function initCidrCalculator() {
       ipArr = parseIp(ipInput.value);
       if (!ipArr) {
         setStatus(statusEl, "error", "Direccion IP invalida.");
-        toggleResults(resultsEl, emptyEl, false);
+        setCidrView("empty");
         return;
       }
       prefix = parseMask(maskInput.value);
       if (prefix === null) {
         setStatus(statusEl, "error", "Mascara invalida. Usa prefijo o decimal punteada.");
-        toggleResults(resultsEl, emptyEl, false);
+        setCidrView("empty");
         return;
       }
     }
 
     const result = computeCidr(ipArr, prefix);
+    if (result.error) {
+      setStatus(statusEl, "error", result.error);
+      setCidrView("empty");
+      return;
+    }
     const range = result.firstHost && result.lastHost
       ? `${formatIp(result.firstHost)} - ${formatIp(result.lastHost)}`
       : "N/A";
@@ -136,8 +169,52 @@ export function initCidrCalculator() {
     fields.binNetwork.textContent = formatBinaryIp(result.network);
     fields.binBroadcast.textContent = formatBinaryIp(result.broadcast);
 
-    binaryEl.hidden = !binaryToggle.checked;
-    toggleResults(resultsEl, emptyEl, true);
+    // Subnet Calculation Logic
+    const subnetsValue = subnetsInput.value.trim();
+    if (subnetsValue) {
+      const desiredSubnets = parseStrictInt(subnetsValue);
+      if (desiredSubnets === null || desiredSubnets <= 0) {
+        setStatus(statusEl, "error", "Cantidad de subredes invalida. Usa un entero positivo.");
+        setCidrView("summary");
+        return;
+      }
+      if (!isNetworkAddress(ipArr, prefix)) {
+        setStatus(statusEl, "warning", "Nota: La IP ingresada no es direccion de red, se usara la red base calculada para las subredes.");
+      }
+
+      const subnetResult = computeSubnets(result.network, prefix, desiredSubnets);
+
+      if (subnetResult.error) {
+        setStatus(statusEl, "error", subnetResult.error);
+        setCidrView("summary");
+        return;
+      } else {
+        subnetElements.chip.textContent = subnetResult.subnets.length;
+        subnetElements.newMask.textContent = `/${subnetResult.newPrefix} (${formatIp(prefixToMask(subnetResult.newPrefix))})`;
+        subnetElements.subnetHosts.textContent = subnetResult.subnets.length > 0 ? subnetResult.subnets[0].usableHosts : "-";
+
+        subnetElements.rows.innerHTML = "";
+
+        const fragment = document.createDocumentFragment();
+        subnetResult.subnets.forEach((sub, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td class="mono">${formatIp(sub.network)}/${sub.prefix}</td>
+            <td class="mono">${sub.firstHost ? formatIp(sub.firstHost) : "N/A"}</td>
+            <td class="mono">${sub.lastHost ? formatIp(sub.lastHost) : "N/A"}</td>
+            <td class="mono">${formatIp(sub.broadcast)}</td>
+            <td class="mono">${formatIp(sub.mask)}</td>
+          `;
+          fragment.appendChild(tr);
+        });
+
+        subnetElements.rows.appendChild(fragment);
+        setCidrView("subnets");
+      }
+    } else {
+      setCidrView("summary");
+    }
   });
 }
 
@@ -146,7 +223,7 @@ export function initVlsmCalculator() {
   const baseInput = document.getElementById("vlsm-base");
   const statusEl = document.getElementById("vlsm-status");
   const resultsEl = document.getElementById("vlsm-results");
-  const emptyEl = document.getElementById("vlsm-empty");
+
   const rowsBody = document.getElementById("vlsm-rows");
   const template = document.getElementById("vlsm-row-template");
   const addRowBtn = document.getElementById("vlsm-add-row");
@@ -196,7 +273,8 @@ export function initVlsmCalculator() {
     addRow();
     addRow();
     setStatus(statusEl, null, null);
-    toggleResults(resultsEl, emptyEl, false);
+    setStatus(statusEl, null, null);
+    resultsEl.hidden = true;
   }
 
   addRow();
@@ -221,7 +299,7 @@ export function initVlsmCalculator() {
     const parsedBase = parseCidrInput(baseInput.value);
     if (!parsedBase) {
       setStatus(statusEl, "error", "Red base invalida. Usa formato IP/prefijo.");
-      toggleResults(resultsEl, emptyEl, false);
+      resultsEl.hidden = true;
       return;
     }
 
@@ -232,7 +310,7 @@ export function initVlsmCalculator() {
         "error",
         `La IP base no es direccion de red. Usa ${formatIp(baseCidr.network)} /${parsedBase.prefix}.`
       );
-      toggleResults(resultsEl, emptyEl, false);
+      resultsEl.hidden = true;
       return;
     }
 
@@ -247,8 +325,8 @@ export function initVlsmCalculator() {
 
       if (!nameValue && !hostValue) return;
 
-      const hosts = Number(hostValue);
-      if (!hostValue || Number.isNaN(hosts) || hosts <= 0 || !Number.isSafeInteger(hosts)) {
+      const hosts = parseStrictInt(hostValue);
+      if (hosts === null || hosts <= 0) {
         setStatus(statusEl, "error", `Hosts invalidos en la fila ${index + 1}.`);
         return;
       }
@@ -261,19 +339,19 @@ export function initVlsmCalculator() {
 
     if (!subnets.length) {
       setStatus(statusEl, "error", "Agrega al menos una subred con hosts requeridos.");
-      toggleResults(resultsEl, emptyEl, false);
+      resultsEl.hidden = true;
       return;
     }
 
     if (statusEl.getAttribute("data-type") === "error") {
-      toggleResults(resultsEl, emptyEl, false);
+      resultsEl.hidden = true;
       return;
     }
 
     const result = computeVlsm(parsedBase.ipArr, parsedBase.prefix, subnets);
     if (result.error) {
       setStatus(statusEl, "error", result.error);
-      toggleResults(resultsEl, emptyEl, false);
+      resultsEl.hidden = true;
       return;
     }
 
@@ -297,14 +375,14 @@ export function initVlsmCalculator() {
 
     result.allocations.forEach((allocation) => {
       const row = document.createElement("tr");
-      const maskLabel = `${formatIp(allocation.mask)} /${allocation.prefix}`;
+      const maskLabel = formatIp(allocation.mask);
       const hostRange = `${formatIp(allocation.firstHost)} - ${formatIp(allocation.lastHost)}`;
 
       row.innerHTML = `
         <td>${allocation.name}</td>
         <td>${allocation.requiredHosts}</td>
         <td>${allocation.neededHosts}</td>
-        <td class="mono">${formatIp(allocation.network)} /${allocation.prefix}</td>
+        <td class="mono">${formatIp(allocation.network)}/${allocation.prefix}</td>
         <td class="mono">${maskLabel}</td>
         <td class="mono">${hostRange}</td>
         <td class="mono">${formatIp(allocation.broadcast)}</td>
@@ -315,7 +393,7 @@ export function initVlsmCalculator() {
       tbody.appendChild(row);
     });
 
-    toggleResults(resultsEl, emptyEl, true);
+    resultsEl.hidden = false;
   });
 }
 

@@ -126,7 +126,7 @@ Desarrollar una calculadora de redes IP que incluya:
 - **Capa UI JS**: `js/ui.js` enlaza formularios, renderiza resultados y muestra errores.
 
 ## Estructura de proyecto
-- `index.html`: pagina principal con secciones CIDR, VLSM, pruebas y guia.
+- `index.html`: pagina principal con secciones CIDR y VLSM.
 - `css/styles.css`: estilos, grid, tablas, componentes y animaciones.
 - `js/main.js`: punto de entrada.
 - `js/ui.js`: control de interfaz, formularios y render.
@@ -142,7 +142,6 @@ Desarrollar una calculadora de redes IP que incluya:
 4. Al enviar un formulario, se valida entrada con `js/ip-utils.js`.
 5. Si es valido, se ejecuta la logica en `js/cidr.js` o `js/vlsm.js`.
 6. Se renderizan tablas y tarjetas de resultados en la UI.
-7. El boton de pruebas ejecuta `js/tests.js` y muestra el reporte.
 
 ## Logica principal
 
@@ -180,10 +179,6 @@ Las pruebas unitarias cubren:
 - Caso CIDR `192.168.10.0/24`.
 - Caso VLSM base `192.168.0.0/24` con `A=100`, `B=50`, `C=25`, `D=10`.
 
-Para ejecutarlas:
-1. Abrir el sitio en un servidor local.
-2. Ir a la seccion **Pruebas unitarias**.
-3. Pulsar **Ejecutar pruebas**.
 
 ## Decisiones tecnicas
 - **Sin framework**: JavaScript modular nativo para mantener el proyecto ligero.

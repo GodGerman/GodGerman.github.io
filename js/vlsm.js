@@ -1,35 +1,66 @@
-import { ipToInt, intToIp, prefixToMask } from "./ip-utils.js";
+import { ipToInt, intToIp, prefixToMask, isValidIpArray } from "./ip-utils.js";
+
+const MAX_HOSTS = Math.pow(2, 32) - 2;
 
 function getHostBits(neededHosts) {
   return Math.ceil(Math.log2(neededHosts));
 }
 
 export function computeVlsm(baseIpArr, basePrefix, subnets) {
+  if (!isValidIpArray(baseIpArr)) {
+    return { error: "Red base invalida." };
+  }
+  if (!Number.isInteger(basePrefix) || basePrefix < 0 || basePrefix > 32) {
+    return { error: "Prefijo base invalido." };
+  }
+
   const baseMaskArr = prefixToMask(basePrefix);
+  if (!baseMaskArr) {
+    return { error: "Prefijo base invalido." };
+  }
   const baseMaskInt = ipToInt(baseMaskArr);
   const baseIpInt = ipToInt(baseIpArr);
-  const baseNetworkInt = baseIpInt & baseMaskInt;
+  const baseNetworkInt = (baseIpInt & baseMaskInt) >>> 0;
   const baseSize = Math.pow(2, 32 - basePrefix);
   const baseEnd = baseNetworkInt + baseSize - 1;
 
-  const normalized = subnets
-    .map((subnet, index) => {
-      const requiredHosts = Number(subnet.hosts);
-      const neededHosts = requiredHosts + 2;
-      const hostBits = getHostBits(neededHosts);
-      const blockSize = Math.pow(2, hostBits);
-      const prefix = 32 - hostBits;
-      return {
-        index,
-        name: subnet.name,
-        requiredHosts,
-        neededHosts,
-        hostBits,
-        blockSize,
-        prefix,
-      };
-    })
-    .sort((a, b) => b.neededHosts - a.neededHosts);
+  if (baseNetworkInt !== baseIpInt) {
+    return { error: "La IP base no es direccion de red." };
+  }
+  if (!Array.isArray(subnets) || subnets.length === 0) {
+    return { error: "Agrega al menos una subred con hosts requeridos." };
+  }
+
+  const normalized = [];
+  for (let index = 0; index < subnets.length; index++) {
+    const subnet = subnets[index] || {};
+    const rawName = typeof subnet.name === "string" ? subnet.name.trim() : "";
+    const name = rawName || `Subred ${index + 1}`;
+    const requiredHosts = Number(subnet.hosts);
+    if (!Number.isSafeInteger(requiredHosts) || requiredHosts <= 0) {
+      return { error: `Hosts invalidos en la subred ${index + 1}.` };
+    }
+    if (requiredHosts > MAX_HOSTS) {
+      return { error: `Hosts exceden el maximo permitido (${MAX_HOSTS}).` };
+    }
+    const neededHosts = requiredHosts + 2;
+    const hostBits = getHostBits(neededHosts);
+    if (!Number.isFinite(hostBits) || hostBits > 32) {
+      return { error: `Hosts exceden el maximo permitido (${MAX_HOSTS}).` };
+    }
+    const blockSize = Math.pow(2, hostBits);
+    const prefix = 32 - hostBits;
+    normalized.push({
+      index,
+      name,
+      requiredHosts,
+      neededHosts,
+      hostBits,
+      blockSize,
+      prefix,
+    });
+  }
+  normalized.sort((a, b) => b.neededHosts - a.neededHosts);
 
   let cursor = baseNetworkInt;
   let usedAddresses = 0;

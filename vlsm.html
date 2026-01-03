@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Calculadora VLSM para subneteo con hosts variables.">
-    <title>VLSM - Calculadora IP</title>
+    <title>Calculadora IP</title>
+    <link rel="icon" type="image/x-icon" href="img/icono.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="css/main.css">
@@ -15,17 +16,18 @@
     <div class="page">
         <header class="site-header">
             <a href="index.html" class="brand">
-                <div class="brand-mark">IP</div>
+                <img src="img/logo.png" alt="Logo" class="brand-logo">
                 <div class="brand-text">
                     <span class="brand-title">Calculadora IP</span>
                     <span class="brand-subtitle">CIDR + VLSM</span>
                 </div>
             </a>
+            <div class="header-credits">
+                Aguilar Bautista César Fernando<br>Ramos Ortiz Ximena Abigail
+            </div>
             <nav class="nav">
-                <a href="cidr.html">CIDR</a>
+                <a href="index.html">CIDR</a>
                 <a href="vlsm.html" class="active">VLSM</a>
-                <a href="pruebas.html">Pruebas</a>
-                <a href="guia.html">Guia</a>
             </nav>
         </header>
 
@@ -33,7 +35,8 @@
             <section id="vlsm" class="section active-section">
                 <div class="section-header">
                     <h2>Calculadora VLSM</h2>
-                    <p>Define una red base y una lista de subredes con hosts requeridos.</p>
+                    <p>Optimiza el direccionamiento de tu red asignando máscaras variables según los hosts necesarios
+                        por segmento.</p>
                 </div>
 
                 <div class="panel">
@@ -73,82 +76,76 @@
 
                         <div id="vlsm-status" class="status" role="alert" aria-live="polite"></div>
                     </form>
+                </div>
 
-                    <div class="results" id="vlsm-results" hidden>
-                        <div class="results-header">
-                            <h3>Resultados VLSM</h3>
-                            <span class="chip" id="vlsm-base-chip">/24</span>
+                <div class="results panel" id="vlsm-results" hidden style="margin-top: 24px;">
+                    <div class="results-header">
+                        <h3>Resultados VLSM</h3>
+                        <span class="chip" id="vlsm-base-chip">/24</span>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <span>Red base</span>
+                            <strong id="vlsm-base-network">-</strong>
                         </div>
-
-                        <div class="summary-grid">
-                            <div class="summary-card">
-                                <span>Red base</span>
-                                <strong id="vlsm-base-network">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Mascara base</span>
-                                <strong id="vlsm-base-mask">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Hosts disponibles</span>
-                                <strong id="vlsm-base-hosts">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Direcciones totales</span>
-                                <strong id="vlsm-base-total">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Hosts solicitados</span>
-                                <strong id="vlsm-requested-hosts">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Direcciones usadas</span>
-                                <strong id="vlsm-used-addresses">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Direcciones restantes</span>
-                                <strong id="vlsm-remaining-addresses">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Hosts restantes</span>
-                                <strong id="vlsm-remaining-hosts">-</strong>
-                            </div>
-                            <div class="summary-card">
-                                <span>Rango restante</span>
-                                <strong id="vlsm-remaining-range">-</strong>
-                            </div>
+                        <div class="summary-card">
+                            <span>Mascara base</span>
+                            <strong id="vlsm-base-mask">-</strong>
                         </div>
-
-                        <div class="table-wrap">
-                            <table class="results-table">
-                                <thead>
-                                    <tr>
-                                        <th>Subred</th>
-                                        <th>Hosts req</th>
-                                        <th>Hosts necesarios</th>
-                                        <th>Network</th>
-                                        <th>Mascara</th>
-                                        <th>Rango de hosts</th>
-                                        <th>Broadcast</th>
-                                        <th>Hosts validos</th>
-                                        <th>Desperdicio</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="vlsm-results-body"></tbody>
-                            </table>
+                        <div class="summary-card">
+                            <span>Hosts disponibles</span>
+                            <strong id="vlsm-base-hosts">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Direcciones totales</span>
+                            <strong id="vlsm-base-total">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Hosts solicitados</span>
+                            <strong id="vlsm-requested-hosts">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Direcciones usadas</span>
+                            <strong id="vlsm-used-addresses">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Direcciones restantes</span>
+                            <strong id="vlsm-remaining-addresses">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Hosts restantes</span>
+                            <strong id="vlsm-remaining-hosts">-</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span>Rango restante</span>
+                            <strong id="vlsm-remaining-range">-</strong>
                         </div>
                     </div>
 
-                    <div class="empty" id="vlsm-empty">
-                        <p>Agrega subredes y calcula para ver resultados.</p>
+                    <div class="table-wrap">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Subred</th>
+                                    <th>Hosts req</th>
+                                    <th>Hosts necesarios</th>
+                                    <th>Network</th>
+                                    <th>Mascara</th>
+                                    <th>Rango de hosts</th>
+                                    <th>Broadcast</th>
+                                    <th>Hosts validos</th>
+                                    <th>Desperdicio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vlsm-results-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer class="site-footer">
-            <p>Calculadora IP CIDR y VLSM. Proyecto academico.</p>
-        </footer>
+
     </div>
 
     <template id="vlsm-row-template">
