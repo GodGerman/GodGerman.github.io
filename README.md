@@ -103,18 +103,18 @@ El proyecto usa JavaScript modular nativo y separa la logica de calculo del rend
 ## Modelo de datos y conversiones
 - **IPv4 como arreglo**: `[a, b, c, d]` para lectura humana y salida.
 - **IPv4 como entero**: `0..2^32-1` para operaciones bitwise y calculos de rangos.
-- **Prefijo CIDR**: entero `0..32` con conversion a mascara decimal punteada.
+- **Prefijo CIDR**: Entero `0..32` con conversion a mascara decimal punteada.
 
-## Flujo principal (alto nivel)
+## Flujo principal
 1. El usuario ingresa datos en el formulario.
 2. `js/ui.js` valida y normaliza entradas con `js/ip-utils.js`.
 3. Se ejecuta la logica en `js/cidr.js` o `js/vlsm.js`.
 4. La UI renderiza resultados y/o mensajes de error.
 
-## Algoritmos implementados (resumen)
+## Algoritmos implementados
 - **CIDR**: `network = ip AND mask`, `broadcast = network OR (~mask)`, `total = 2^(32 - prefix)`.
-- **FLSM**: calcula bits prestados `ceil(log2(subredes))`, nuevo prefijo y salto por bloque.
-- **VLSM**: suma 2 hosts (red/broadcast), ordena desc, asigna bloques contiguos y valida limite.
+- **FLSM**: Calcula bits prestados `ceil(log2(subredes))`, nuevo prefijo y salto por bloque.
+- **VLSM**: Suma 2 hosts (red/broadcast), ordena desc, asigna bloques contiguos y valida limite.
 
 ## Validaciones clave
 - IP invalida, prefijo fuera de rango, mascara no contigua.
@@ -211,31 +211,13 @@ Las pruebas unitarias cubren:
 - Caso CIDR `192.168.10.0/24`.
 - Caso VLSM base `192.168.0.0/24` con `A=100`, `B=50`, `C=25`, `D=10`.
 
-
-## Decisiones tecnicas
-- **Sin framework**: JavaScript modular nativo para mantener el proyecto ligero.
-- **Separacion de capas**: logica, utilidades y UI en archivos independientes.
-- **Render dinamico**: resultados se generan en tablas con DOM limpio.
-- **Accesibilidad**: etiquetas, mensajes con `aria-live` y controles claros.
-
 ## Ejecucion local
-Por el uso de ES modules, es recomendable levantar un servidor local:
+El proyecto se ejecuta con XAMPP usando Apache:
 
-```bash
-python3 -m http.server 8000
-```
+1. Coloca el proyecto dentro de la carpeta `htdocs` de XAMPP.
+2. Inicia Apache desde el panel de control de XAMPP.
+3. Abre el navegador y carga el archivo `index.html` desde el servidor local.
 
-Luego abrir `http://localhost:8000` en el navegador.
-
-Alternativas:
-
-```bash
-python -m http.server 8000
-```
-
-```bash
-php -S localhost:8000
-```
-
-## Atribuciones
-- Fuentes de Google Fonts: Space Grotesk, IBM Plex Mono.
+## Ejecucion en la web
+El proyecto ya esta desplegado. Puedes acceder aqui:
+- https://godgerman.github.io/
