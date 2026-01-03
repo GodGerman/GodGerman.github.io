@@ -1,3 +1,5 @@
+/* Tablas: contenedores, celdas y estados */
+/* Contenedores con scroll horizontal para tablas */
 .table-wrap,
 .table-container {
     width: 100%;
@@ -7,6 +9,7 @@
     background: rgba(0, 0, 0, 0.2);
 }
 
+/* Tablas base: entrada, resultados y datos */
 .input-table,
 .results-table,
 .data-table {
@@ -15,6 +18,7 @@
     min-width: 680px;
 }
 
+/* Inputs dentro de tablas editables */
 .input-table input {
     width: 100%;
     padding: 8px 12px;
@@ -26,12 +30,14 @@
     transition: all 0.2s;
 }
 
+/* Focus de inputs en tabla */
 .input-table input:focus {
     outline: none;
     border-color: var(--primary);
     background: rgba(0, 0, 0, 0.4);
 }
 
+/* Celdas y encabezados: espaciado y bordes suaves */
 .input-table th,
 .input-table td,
 .results-table th,
@@ -40,17 +46,19 @@
 .data-table td {
     padding: 16px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    /* Softer border */
+    /* Borde tenue para separacion visual */
     text-align: left;
     vertical-align: middle;
 }
 
+/* Ultima fila sin borde inferior */
 .input-table tr:last-child td,
 .results-table tr:last-child td,
 .data-table tr:last-child td {
     border-bottom: none;
 }
 
+/* Encabezados con fondo fijo */
 .input-table th,
 .results-table th,
 .data-table th {
@@ -66,18 +74,19 @@
     text-align: center;
 }
 
+/* Columna de acciones (botones) */
 .cell-action {
     text-align: right;
     width: 100px;
 }
 
-/* Zebra striping */
+/* Zebra striping para filas */
 .results-table tbody tr:nth-child(even),
 .data-table tbody tr:nth-child(even) {
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* Hover effect on table rows */
+/* Hover en filas */
 .results-table tbody tr:hover,
 .data-table tbody tr:hover {
     background: rgba(255, 255, 255, 0.05);

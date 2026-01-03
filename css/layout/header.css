@@ -1,3 +1,4 @@
+/* Header fijo con fondo translucto */
 .site-header {
     position: sticky;
     top: 0;
@@ -8,13 +9,14 @@
     padding: 0 4vw;
     height: var(--nav-height);
     background: rgba(11, 12, 21, 0.7);
-    /* Harder dark tint */
+    /* Tinte oscuro para contraste con el contenido */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
     transition: all 0.3s ease;
 }
 
+/* Marca: logo + texto */
 .brand {
     display: flex;
     align-items: center;
@@ -23,20 +25,23 @@
     color: var(--ink);
 }
 
+/* Logo dentro de la marca */
 .brand-logo {
     height: 40px;
     width: auto;
     object-fit: contain;
-    /* Optional shadow if PNG needs pop */
+    /* Sombra suave para separar el logo del fondo */
     filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
 }
 
+/* Bloque de texto de marca */
 .brand-text {
     display: flex;
     flex-direction: column;
     line-height: 1.1;
 }
 
+/* Titulo principal de marca */
 .brand-title {
     font-size: 1.05rem;
     font-weight: 700;
@@ -44,6 +49,7 @@
     letter-spacing: 0.5px;
 }
 
+/* Subtitulo de marca */
 .brand-subtitle {
     font-size: 0.7rem;
     color: var(--accent);
@@ -52,6 +58,7 @@
     letter-spacing: 1px;
 }
 
+/* Creditos de autores */
 .header-credits {
     font-size: 0.8rem;
     color: var(--muted);
@@ -62,12 +69,14 @@
     margin: 0 16px;
 }
 
+/* Navegacion principal */
 .nav {
     display: flex;
     gap: 8px;
     align-items: center;
 }
 
+/* Enlaces de navegacion */
 .nav a {
     text-decoration: none;
     color: var(--muted);
@@ -75,11 +84,12 @@
     font-size: 0.9rem;
     padding: 8px 20px;
     border-radius: 99px;
-    /* Pill shape */
+    /* Forma tipo pastilla para resaltar como botones */
     transition: all 0.3s ease;
     border: 1px solid transparent;
 }
 
+/* Hover de enlaces */
 .nav a:hover {
     color: var(--ink);
     background: rgba(255, 255, 255, 0.05);
@@ -87,6 +97,7 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
+/* Estado activo */
 .nav a.active {
     background: rgba(59, 130, 246, 0.15);
     color: var(--primary);
@@ -94,6 +105,7 @@
     box-shadow: 0 0 15px var(--primary-glow);
 }
 
+/* Responsive: header en columna y nav desplazable */
 @media (max-width: 720px) {
     .site-header {
         flex-direction: column;
@@ -115,7 +127,7 @@
         width: 100%;
         overflow-x: auto;
         padding-bottom: 4px;
-        /* Hide scrollbar for cleaner look on mobile */
+        /* Oculta scrollbar para una vista mas limpia en movil */
         scrollbar-width: none;
     }
 

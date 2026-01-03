@@ -1,7 +1,10 @@
+/* Reinicio base: unifica el modelo de caja y estilos globales */
+/* Normaliza box-sizing para incluir padding y bordes en el calculo */
 * {
     box-sizing: border-box;
 }
 
+/* Estilos base del documento: tipografia, color y fondo */
 body {
     margin: 0;
     font-family: var(--font-sans);
@@ -10,44 +13,50 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    /* Gradientes radiales para textura del fondo */
     background-image:
         radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08), transparent 25%);
     background-attachment: fixed;
 }
 
+/* Contenedor principal para apilar header + main */
 .page {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* Scrollbar customization */
+/* Scrollbar personalizado (WebKit) para integrar con la paleta */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
+/* Fondo de la pista del scrollbar */
 ::-webkit-scrollbar-track {
     background: var(--bg);
 }
 
+/* Barra deslizante */
 ::-webkit-scrollbar-thumb {
     background: var(--surface-border);
     border-radius: 4px;
 }
 
+/* Hover sobre el thumb para mayor contraste */
 ::-webkit-scrollbar-thumb:hover {
     background: var(--muted);
 }
 
-/* Global Reset for Number Inputs */
+/* Reinicio global para inputs tipo number (oculta spinners del navegador) */
 input[type="number"] {
     -webkit-appearance: textfield !important;
     -moz-appearance: textfield !important;
     appearance: textfield !important;
 }
 
+/* WebKit: elimina los botones internos y externos del spinner */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none !important;

@@ -1,16 +1,26 @@
+/* Archivo principal de estilos: importa modulos por categoria */
 /* Base */
+/* Tokens visuales: colores, tipografia y radios */
 @import "base/variables.css";
+/* Reinicio base: box-sizing, body e inputs */
 @import "base/reset.css";
 
 /* Layout */
+/* Estructura general, paneles y animaciones */
 @import "layout/grid.css";
+/* Header y navegacion principal */
 @import "layout/header.css";
 
 
 /* Components */
+/* Botones, variantes y estados */
 @import "components/buttons.css";
+/* Formularios y controles de entrada */
 @import "components/forms.css";
 
+/* Tarjetas, resumenes y bloques de informacion */
 @import "components/cards.css";
+/* Tablas y contenedores desplazables */
 @import "components/tables.css";
+/* Estados, chips y resultados */
 @import "components/status.css";

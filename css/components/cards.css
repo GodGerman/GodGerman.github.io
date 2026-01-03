@@ -1,3 +1,5 @@
+/* Tarjetas y resumenes visuales */
+/* Tarjeta hero principal */
 .hero-card {
     background: rgba(20, 22, 35, 0.8);
     border-radius: var(--radius);
@@ -11,7 +13,7 @@
     position: relative;
 }
 
-/* Neon border effect on hover or default */
+/* Borde neon para la tarjeta hero */
 .hero-card::after {
     content: '';
     position: absolute;
@@ -26,6 +28,7 @@
     pointer-events: none;
 }
 
+/* Titulo de tarjeta */
 .card-title {
     font-weight: 600;
     color: var(--accent);
@@ -35,12 +38,14 @@
     text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
 }
 
+/* Grid interno para pares etiqueta/valor */
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 32px;
 }
 
+/* Etiqueta secundaria en tarjetas */
 .card-label {
     display: block;
     font-size: 0.75rem;
@@ -50,6 +55,7 @@
     letter-spacing: 1px;
 }
 
+/* Valor destacado en tarjetas */
 .card-value {
     font-size: 1.2rem;
     font-weight: 600;
@@ -57,6 +63,7 @@
     font-family: var(--font-mono);
 }
 
+/* Nota auxiliar en tarjetas */
 .card-note {
     color: var(--muted);
     font-size: 0.85rem;
@@ -65,12 +72,14 @@
     opacity: 0.7;
 }
 
+/* Grid para resumenes (VLSM/CIDR) */
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
+/* Tarjetas de resumen y resultados */
 .summary-card,
 .result-item {
     background: rgba(30, 32, 50, 0.4);
@@ -86,6 +95,7 @@
     overflow: hidden;
 }
 
+/* Hover para tarjetas */
 .summary-card:hover,
 .result-item:hover {
     background: rgba(30, 32, 50, 0.6);
@@ -94,7 +104,7 @@
     box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.5);
 }
 
-/* Hover glow effect */
+/* Halo radial que sigue el cursor (usa CSS variables) */
 .summary-card::before,
 .result-item::before {
     content: '';
@@ -109,11 +119,13 @@
     pointer-events: none;
 }
 
+/* Activacion del halo en hover */
 .summary-card:hover::before,
 .result-item:hover::before {
     opacity: 1;
 }
 
+/* Etiquetas de resumen/resultados */
 .summary-card span,
 .result-item dt {
     font-size: 0.75rem;
@@ -124,6 +136,7 @@
     margin: 0;
 }
 
+/* Valores de resumen/resultados */
 .summary-card strong,
 .result-item dd {
     font-size: 1.5rem;
@@ -135,8 +148,9 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Ajustes para result-item cuando se usa dentro de listas */
 .result-item {
-    /* Reset specific grid layout if any */
+    /* Garantiza layout en columna incluso si hereda estilos de grid */
     display: flex;
-    /* Override previous grid fallback */
+    /* Reafirma el layout para evitar comportamientos no deseados */
 }

@@ -1,20 +1,31 @@
 <!doctype html>
 <html lang="es">
+<!--
+  Documento principal de la calculadora VLSM.
+  Esta pagina permite capturar red base y subredes con hosts variables.
+-->
 
 <head>
+    <!-- Metadatos base: codificacion, viewport y descripcion para SEO/accesibilidad -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Calculadora VLSM para subneteo con hosts variables.">
+    <!-- Titulo de la pestaña del navegador -->
     <title>Calculadora IP</title>
+    <!-- Favicon y preconexion para optimizar la carga de fuentes externas -->
     <link rel="icon" type="image/x-icon" href="img/icono.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Hoja de estilos principal (importa los modulos CSS internos) -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
+    <!-- Contenedor general: header + contenido principal -->
     <div class="page">
+        <!-- Barra superior con marca, creditos y navegacion global -->
         <header class="site-header">
+            <!-- Marca: logo + nombre del sistema -->
             <a href="index.html" class="brand">
                 <img src="img/logo.png" alt="Logo" class="brand-logo">
                 <div class="brand-text">
@@ -22,9 +33,11 @@
                     <span class="brand-subtitle">CIDR + VLSM</span>
                 </div>
             </a>
+            <!-- Creditos del equipo -->
             <div class="header-credits">
                 Aguilar Bautista César Fernando<br>Ramos Ortiz Ximena Abigail
             </div>
+            <!-- Navegacion entre secciones CIDR y VLSM -->
             <nav class="nav">
                 <a href="index.html">CIDR</a>
                 <a href="vlsm.html" class="active">VLSM</a>
@@ -32,28 +45,40 @@
         </header>
 
         <main>
+            <!-- Seccion VLSM: formulario y resultados -->
             <section id="vlsm" class="section active-section">
+                <!-- Encabezado descriptivo: titulo y resumen del objetivo -->
                 <div class="section-header">
                     <h2>Calculadora VLSM</h2>
                     <p>Optimiza el direccionamiento de tu red asignando máscaras variables según los hosts necesarios
                         por segmento.</p>
                 </div>
 
+                <!-- Panel del formulario de entrada VLSM -->
                 <div class="panel">
+                    <!--
+                      Formulario VLSM:
+                      - Captura la red base en formato CIDR.
+                      - Permite ingresar multiples subredes con hosts requeridos.
+                    -->
                     <form id="vlsm-form" class="form">
+                        <!-- Grid de red base y nota informativa -->
                         <div class="form-grid">
                             <div class="form-block">
+                                <!-- Entrada de red base en formato CIDR -->
                                 <label for="vlsm-base">Red base (IP/prefijo)</label>
                                 <input id="vlsm-base" name="vlsm-base" type="text" placeholder="192.168.0.0/24"
                                     autocomplete="off" required>
                             </div>
                             <div class="form-block">
+                                <!-- Nota fija sobre el ordenamiento del algoritmo -->
                                 <label for="vlsm-note">Nota</label>
                                 <input id="vlsm-note" type="text"
                                     value="Se ordena por hosts requeridos de mayor a menor" disabled>
                             </div>
                         </div>
 
+                        <!-- Tabla editable de subredes solicitadas -->
                         <div class="table-wrap">
                             <table class="input-table">
                                 <thead>
@@ -67,6 +92,7 @@
                             </table>
                         </div>
 
+                        <!-- Acciones del formulario VLSM -->
                         <div class="form-actions">
                             <button class="btn ghost" type="button" id="vlsm-add-row">Agregar subred</button>
                             <button class="btn primary" type="submit">Calcular VLSM</button>
@@ -74,16 +100,20 @@
                             <button class="btn subtle" type="button" id="vlsm-clear">Limpiar</button>
                         </div>
 
+                        <!-- Contenedor de mensajes de estado para errores/avisos -->
                         <div id="vlsm-status" class="status" role="alert" aria-live="polite"></div>
                     </form>
                 </div>
 
+                <!-- Panel de resultados VLSM -->
                 <div class="results panel" id="vlsm-results" hidden style="margin-top: 24px;">
+                    <!-- Encabezado del bloque de resultados -->
                     <div class="results-header">
                         <h3>Resultados VLSM</h3>
                         <span class="chip" id="vlsm-base-chip">/24</span>
                     </div>
 
+                    <!-- Resumen numerico de red base y consumo -->
                     <div class="summary-grid">
                         <div class="summary-card">
                             <span>Red base</span>
@@ -123,6 +153,7 @@
                         </div>
                     </div>
 
+                    <!-- Tabla con el detalle de asignaciones VLSM -->
                     <div class="table-wrap">
                         <table class="results-table">
                             <thead>
@@ -148,6 +179,7 @@
 
     </div>
 
+    <!-- Plantilla HTML para agregar filas dinamicas de subredes -->
     <template id="vlsm-row-template">
         <tr>
             <td><input class="vlsm-name" type="text" placeholder="DeptoA" autocomplete="off"></td>
@@ -156,6 +188,7 @@
         </tr>
     </template>
 
+    <!-- Script principal que inicializa la UI y la logica de calculo -->
     <script type="module" src="js/main.js"></script>
 </body>
 

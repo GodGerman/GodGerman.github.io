@@ -1,49 +1,51 @@
+/* Fuentes externas usadas por la UI */
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
+/* Variables globales del tema (colores, tipografia y medidas) */
 :root {
-    /* Color Palette: Dark Future */
-    --bg: #0b0c15;
-    --bg-2: #121420;
-    /* Slightly lighter background for contrast */
+    /* Tokens globales de diseno: colores, sombras y tipografia */
+    /* Paleta base (fondos) */
+    --bg: #0b0c15; /* Fondo principal */
+    --bg-2: #121420; /* Fondo alterno para contraste */
 
-    /* Primary: Electric Blue */
-    --primary: #3b82f6;
-    --primary-glow: rgba(59, 130, 246, 0.5);
-    --primary-hover: #2563eb;
+    /* Color primario (acciones) */
+    --primary: #3b82f6; /* Botones principales y enlaces activos */
+    --primary-glow: rgba(59, 130, 246, 0.5); /* Resplandor de apoyo */
+    --primary-hover: #2563eb; /* Variacion para hover */
 
-    /* Accent: Neon Cyan */
-    --accent: #06b6d4;
-    --accent-glow: rgba(6, 182, 212, 0.5);
+    /* Color de acento */
+    --accent: #06b6d4; /* Resaltados secundarios */
+    --accent-glow: rgba(6, 182, 212, 0.5); /* Resplandor de acento */
 
-    /* Surface: Glassmorphic */
-    --surface: rgba(20, 22, 35, 0.6);
-    --surface-2: rgba(30, 32, 50, 0.6);
-    --surface-border: rgba(255, 255, 255, 0.08);
+    /* Superficies transluidas */
+    --surface: rgba(20, 22, 35, 0.6); /* Paneles principales */
+    --surface-2: rgba(30, 32, 50, 0.6); /* Paneles secundarios */
+    --surface-border: rgba(255, 255, 255, 0.08); /* Bordes suaves */
 
-    /* Text */
-    --ink: #f1f5f9;
-    /* Primary text - almost white */
-    --muted: #94a3b8;
-    /* Secondary text */
-    --border: rgba(255, 255, 255, 0.1);
+    /* Texto y bordes */
+    --ink: #f1f5f9; /* Texto principal */
+    --muted: #94a3b8; /* Texto secundario */
+    --border: rgba(255, 255, 255, 0.1); /* Lineas y divisores */
 
-    /* Functional */
-    --success: #10b981;
-    --success-glow: rgba(16, 185, 129, 0.4);
-    --error: #ef4444;
-    --error-glow: rgba(239, 68, 68, 0.4);
-    --warning: #f59e0b;
+    /* Estados funcionales */
+    --success: #10b981; /* Mensajes correctos */
+    --success-glow: rgba(16, 185, 129, 0.4); /* Resplandor success */
+    --error: #ef4444; /* Mensajes de error */
+    --error-glow: rgba(239, 68, 68, 0.4); /* Resplandor error */
+    --warning: #f59e0b; /* Mensajes de advertencia */
 
-    --shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 15px var(--primary-glow);
+    /* Sombras y halos */
+    --shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra base */
+    --shadow-glow: 0 0 15px var(--primary-glow); /* Halo primario */
 
-    --radius: 12px;
-    --radius-sm: 6px;
+    /* Radios para esquinas */
+    --radius: 12px; /* Radios generales */
+    --radius-sm: 6px; /* Radios compactos */
 
-    /* Typography */
-    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    /* Modern, geometric sans */
-    --font-mono: 'JetBrains Mono', monospace;
+    /* Tipografia */
+    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif; /* Texto general */
+    --font-mono: 'JetBrains Mono', monospace; /* Valores tecnicos */
 
-    --nav-height: 70px;
+    /* Medidas base */
+    --nav-height: 70px; /* Altura del header */
 }

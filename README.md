@@ -1,4 +1,4 @@
-# Requerimientos del proyecto: Calculadora IP (CIDR y VLSM)
+# Requerimientos del Proyecto: Calculadora IP (CIDR y VLSM)
 
 Este README resume y completa los requerimientos extraidos de `Proyecto.pdf`. Esta enfocado en lo necesario para iniciar el desarrollo con HTML, CSS y JavaScript.
 
@@ -11,35 +11,35 @@ Desarrollar una calculadora de redes IP que incluya:
 
 ### 1) Calculadora IP CIDR
 - Entrada:
-  - direccion IP con prefijo (ej. `192.168.1.0/24`) o IP + mascara,
-  - la mascara puede ser en prefijo `/n` o en notacion decimal punteada.
-- Salida (obligatoria):
-  - network address,
-  - rango de hosts (primer host y ultimo host),
-  - direccion broadcast,
-  - mascara en notacion decimal punteada y prefijo `/n`,
-  - numero de hosts disponibles,
-  - representacion binaria (opcional).
+  - Direccion IP con prefijo (ej. `192.168.1.0/24`) o IP + mascara,
+  - La mascara puede ser en prefijo `/n` o en notacion decimal punteada.
+- Salida:
+  - Network address,
+  - Rango de hosts (primer host y ultimo host),
+  - Direccion broadcast,
+  - Mascara en notacion decimal punteada,
+  - Numero de hosts disponibles,
+  - Representacion binaria (Opcional).
 - Validar entradas y mostrar mensajes de error claros.
 
 ### 2) Calculadora VLSM
 - Entrada:
-  - red base (ej. `10.0.0.0/16`),
-  - lista de subredes con nombre y hosts requeridos (ej. `DeptoA: 120`, `DeptoB: 50`, etc.).
+  - Red base (ej. `10.0.0.0/16`),
+  - Lista de subredes con nombre y hosts requeridos (ej. `DeptoA: 120`, `DeptoB: 50`, etc.).
 - Reglas del algoritmo:
   - `needed_hosts = required_hosts + 2` (red y broadcast).
-  - ordenar subredes por `needed_hosts` de mayor a menor.
+  - Ordenar subredes por `needed_hosts` de mayor a menor.
   - `mask_bits = 32 - ceil(log2(needed_hosts))`.
   - `block_size = 2^(32 - mask_bits)`.
-  - asignar bloques contiguos sin solapamientos dentro de la red base.
-  - validar que no se exceda el espacio disponible; si excede, error claro.
+  - Asignar bloques contiguos sin solapamientos dentro de la red base.
+  - Validar que no se exceda el espacio disponible; si excede, error claro.
 - Salida por subred:
-  - network,
-  - mascara (prefijo y dotted),
-  - rango de hosts,
-  - broadcast,
-  - numero de hosts validos,
-  - espacio desperdiciado.
+  - Network,
+  - Mascara,
+  - Rango de hosts,
+  - Broadcast,
+  - Numero de hosts validos,
+  - Espacio desperdiciado.
 - Mostrar espacio restante en la red base (si aplica).
 
 ### 3) Validaciones y manejo de errores
@@ -49,11 +49,16 @@ Desarrollar una calculadora de redes IP que incluya:
 - Mensajes de error comprensibles y consistentes.
 
 ### 4) Interfaz y salida
-- Salida legible; GUI opcional.
-- Para web: formularios claros y resultados en tablas o tarjetas.
-- Prioridad: calculo correcto y salida entendible.
+- Salida legible; GUI.
+- Para Web: formularios claros y resultados en tablas o tarjetas.
 
-## Algoritmo VLSM (pasos base)
+## Calculo CIDR
+- Total de direcciones por red: `2^(32 - prefix)`.
+- Hosts disponibles: `2^(32 - prefix) - 2` (red y broadcast).
+- Network address: `ip AND mask`.
+- Broadcast: `network OR (~mask)`.
+
+## Calculo VLSM
 1. Entrada: `network_base`, `prefix_base`, `subnets = [(name, required_hosts), ...]`.
 2. Preparar lista: para cada subred, `needed_hosts = required_hosts + 2`.
 3. Ordenar subredes por `needed_hosts` descendente.
@@ -65,69 +70,61 @@ Desarrollar una calculadora de redes IP que incluya:
    - `first_host = network_address + 1`.
    - `last_host = network_address + block_size - 2`.
    - `broadcast = network_address + block_size - 1`.
-   - guardar asignacion con `/mask_bits`.
+   - Guardar asignacion con `/mask_bits`.
    - `current_network = current_network + block_size`.
 6. Validar que `current_network` no exceda `network_base + 2^(32 - prefix_base)`.
 7. Si excede, devolver error: espacio insuficiente.
 8. Nota tecnica: trabajar con IPs como enteros facilita sumas y alineacion; incluir funciones de conversion dotted <-> integer.
-
-## Reglas de calculo CIDR (referencia)
-- total de direcciones por red: `2^(32 - prefix)`.
-- hosts disponibles: `2^(32 - prefix) - 2` (red y broadcast).
-- network address: `ip AND mask`.
-- broadcast: `network OR (~mask)`.
-
-## Requisitos de presentacion de resultados
-- Mostrar resultados de forma clara y consistente.
-- Para VLSM, presentar cada subred con sus campos completos.
-- Incluir mensajes de error visibles y no ambiguos.
 
 ## Casos de prueba requeridos
 - CIDR: `192.168.10.0/24` -> network `192.168.10.0`, host range `192.168.10.1-192.168.10.254`, broadcast `192.168.10.255`.
 - VLSM: base `192.168.0.0/24`, requerimientos `A=100`, `B=50`, `C=25`, `D=10`; mostrar asignacion de subredes y espacio restante.
 - Caso limite: pedir mas hosts de los disponibles debe producir un error claro.
 
-## Requisitos tecnicos del codigo
-- Estructura modular: separar logica de calculo, UI y utilidades.
-- Comentarios claros en funciones criticas.
-- Pruebas unitarias basicas para funciones criticas (mascara, broadcast).
-- README con pasos de ejecucion y pruebas.
-- Licencia o atribucion si se usan librerias externas.
+# Documentacion del Sistema
 
-## Pruebas unitarias (minimo esperado)
-- pruebas de calculo de mascara y broadcast.
-- pruebas de conversion IP dotted <-> integer.
-- pruebas de VLSM con los casos requeridos.
+## Vision general
+Calculadora web estatica para IPv4 con dos vistas:
+- **CIDR/FLSM** en `index.html`.
+- **VLSM** en `vlsm.html`.
 
-## Entregables obligatorios (segun PDF)
-- Documento PDF con portada, introduccion, desarrollo (incluye algoritmo), fragmentos de codigo y explicacion, conclusiones y pruebas.
-- README con pasos de ejecucion y pruebas.
-- Video demostrativo (mp4) con presentacion, explicacion del VLSM, demo en vivo y pruebas.
-- Codigo fuente en ZIP o link a repositorio.
-- Ejecutable o instrucciones claras de ejecucion (incluir `.bat`/`.sh` si aplica).
-- Lista de integrantes y roles (firma electronica o texto).
-- Formato de nombres: `EquipoX_CalculadoraIP.zip`, `EquipoX_CalculadoraIP.pdf`, `EquipoX_CalculadoraIP.mp4`.
+El proyecto usa JavaScript modular nativo y separa la logica de calculo del renderizado.
 
-## Referencias (ejemplos de calculadoras)
-- CIDR: `https://www.aprendaredes.com/calculadora-ip/`
-- CIDR CGI: `https://aprendaredes.com/cgi-bin/ipcalc/ipcalc_cgi1`
-- VLSM: `https://arcadio.gq/calculadora-subredes-vlsm.html`
+## Capas y responsabilidades
+- **Presentacion**: `index.html`, `vlsm.html` definen formularios y contenedores de resultados.
+- **Estilos**: `css/main.css` y modulos CSS (base, layout, components) definen la identidad visual.
+- **Orquestacion**: `js/main.js` detecta la pagina y activa los modulos necesarios.
+- **UI/DOM**: `js/ui.js` valida entradas, muestra errores y renderiza tablas/tarjetas.
+- **Calculo CIDR/FLSM**: `js/cidr.js` implementa operaciones de red y subredes fijas.
+- **Calculo VLSM**: `js/vlsm.js` asigna bloques variables con verificacion de espacio.
+- **Utilidades IPv4**: `js/ip-utils.js` parsea, valida y convierte IPs/marascaras.
+- **Pruebas**: `js/tests.js` ejecuta pruebas unitarias basicas sin dependencias externas.
 
-# Documentacion del sistema
+## Modelo de datos y conversiones
+- **IPv4 como arreglo**: `[a, b, c, d]` para lectura humana y salida.
+- **IPv4 como entero**: `0..2^32-1` para operaciones bitwise y calculos de rangos.
+- **Prefijo CIDR**: entero `0..32` con conversion a mascara decimal punteada.
 
-## Arquitectura
-- **UI**: `index.html` define estructura, formularios y contenedores de resultados.
-- **Estilos**: `css/styles.css` contiene la identidad visual, layout responsive y animaciones.
-- **Orquestacion**: `js/main.js` inicializa modulos en `DOMContentLoaded`.
-- **Logica CIDR**: `js/cidr.js` resuelve red, broadcast y rangos.
-- **Logica VLSM**: `js/vlsm.js` asigna bloques contiguos y valida espacio.
-- **Utilidades**: `js/ip-utils.js` conversiones y validaciones IPv4.
-- **Pruebas**: `js/tests.js` ejecuta pruebas unitarias basicas.
-- **Capa UI JS**: `js/ui.js` enlaza formularios, renderiza resultados y muestra errores.
+## Flujo principal (alto nivel)
+1. El usuario ingresa datos en el formulario.
+2. `js/ui.js` valida y normaliza entradas con `js/ip-utils.js`.
+3. Se ejecuta la logica en `js/cidr.js` o `js/vlsm.js`.
+4. La UI renderiza resultados y/o mensajes de error.
+
+## Algoritmos implementados (resumen)
+- **CIDR**: `network = ip AND mask`, `broadcast = network OR (~mask)`, `total = 2^(32 - prefix)`.
+- **FLSM**: calcula bits prestados `ceil(log2(subredes))`, nuevo prefijo y salto por bloque.
+- **VLSM**: suma 2 hosts (red/broadcast), ordena desc, asigna bloques contiguos y valida limite.
+
+## Validaciones clave
+- IP invalida, prefijo fuera de rango, mascara no contigua.
+- Red base no alineada al prefijo.
+- Hosts requeridos menores o iguales a cero.
+- Exceso de espacio respecto a la red base.
 
 ## Estructura de proyecto
 - `index.html`: pagina principal con secciones CIDR y VLSM.
-- `css/styles.css`: estilos, grid, tablas, componentes y animaciones.
+- `css/main.css`: estilos, grid, tablas, componentes y animaciones.
 - `js/main.js`: punto de entrada.
 - `js/ui.js`: control de interfaz, formularios y render.
 - `js/ip-utils.js`: parseo y conversion IP/prefijo/mascara.
@@ -135,8 +132,43 @@ Desarrollar una calculadora de redes IP que incluya:
 - `js/vlsm.js`: calculos VLSM.
 - `js/tests.js`: pruebas unitarias.
 
+## Estructura de archivos
+```
+.
+|-- Proyecto.pdf
+|-- README.md
+|-- index.html
+|-- vlsm.html
+|-- css
+|   |-- main.css
+|   |-- base
+|   |   |-- reset.css
+|   |   `-- variables.css
+|   |-- components
+|   |   |-- buttons.css
+|   |   |-- cards.css
+|   |   |-- forms.css
+|   |   |-- hero.css
+|   |   |-- status.css
+|   |   `-- tables.css
+|   `-- layout
+|       |-- footer.css
+|       |-- grid.css
+|       `-- header.css
+|-- img
+|   |-- icono.ico
+|   `-- logo.png
+`-- js
+    |-- cidr.js
+    |-- ip-utils.js
+    |-- main.js
+    |-- tests.js
+    |-- ui.js
+    `-- vlsm.js
+```
+
 ## Flujo de ejecucion
-1. El navegador carga `index.html` y `css/styles.css`.
+1. El navegador carga `index.html` y `css/main.css`.
 2. `js/main.js` registra los inicializadores.
 3. `js/ui.js` enlaza eventos de formularios CIDR y VLSM.
 4. Al enviar un formulario, se valida entrada con `js/ip-utils.js`.

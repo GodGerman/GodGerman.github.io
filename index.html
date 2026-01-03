@@ -1,20 +1,31 @@
 <!doctype html>
 <html lang="es">
+<!--
+  Documento principal de la calculadora CIDR.
+  Esta pagina contiene el formulario, la salida de resultados y la tabla FLSM opcional.
+-->
 
 <head>
+  <!-- Metadatos base: codificacion, viewport y descripcion para SEO/accesibilidad -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Calculadora CIDR con validaciones y resultados detallados.">
+  <!-- Titulo de la pestaña del navegador -->
   <title>Calculadora IP</title>
+  <!-- Favicon y preconexion para optimizar la carga de fuentes externas -->
   <link rel="icon" type="image/x-icon" href="img/icono.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Hoja de estilos principal (importa los modulos CSS internos) -->
   <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
+  <!-- Contenedor general: header + contenido principal -->
   <div class="page">
+    <!-- Barra superior con marca, creditos y navegacion global -->
     <header class="site-header">
+      <!-- Marca: logo + nombre del sistema -->
       <a href="index.html" class="brand">
         <img src="img/logo.png" alt="Logo" class="brand-logo">
         <div class="brand-text">
@@ -22,9 +33,11 @@
           <span class="brand-subtitle">CIDR + VLSM</span>
         </div>
       </a>
+      <!-- Creditos del equipo -->
       <div class="header-credits">
         Aguilar Bautista César Fernando<br>Ramos Ortiz Ximena Abigail
       </div>
+      <!-- Navegacion entre secciones CIDR y VLSM -->
       <nav class="nav">
         <a href="index.html" class="active">CIDR</a>
         <a href="vlsm.html">VLSM</a>
@@ -32,57 +45,76 @@
     </header>
 
     <main>
+      <!-- Seccion CIDR: formulario y resultados -->
       <section id="cidr" class="section active-section">
+        <!-- Encabezado descriptivo: titulo y breve explicacion de la herramienta -->
         <div class="section-header">
           <h2>Calculadora CIDR</h2>
           <p>Analiza redes IPv4, obtén rangos de hosts, conversiones binarias y genera subredes de longitud fija (FLSM).
           </p>
         </div>
+        <!-- Panel del formulario de entrada CIDR -->
         <div class="panel">
+          <!--
+            Formulario CIDR:
+            - Permite una entrada combinada IP/prefijo o IP + mascara por separado.
+            - Incluye opcion para generar subredes FLSM y mostrar binario.
+          -->
           <form id="cidr-form" class="form">
             <div class="form-block">
+              <!-- Entrada combinada IP/prefijo (prioritaria si se llena) -->
               <label for="cidr-combined">IP con prefijo (opcional)</label>
               <input id="cidr-combined" name="cidr-combined" type="text" placeholder="192.168.10.0/24"
                 autocomplete="off">
               <p class="helper">Si usas este campo, no es necesario completar los de abajo.</p>
             </div>
 
+            <!-- Grupo de campos IP, mascara y subredes -->
             <div class="form-grid">
               <div class="form-block">
+                <!-- Entrada de direccion IP separada -->
                 <label for="cidr-ip">Direccion IP</label>
                 <input id="cidr-ip" name="cidr-ip" type="text" placeholder="192.168.10.0" autocomplete="off">
               </div>
               <div class="form-block">
+                <!-- Entrada de mascara en prefijo o decimal punteada -->
                 <label for="cidr-mask">Mascara (prefijo o decimal)</label>
                 <input id="cidr-mask" name="cidr-mask" type="text" placeholder="/24 o 255.255.255.0" autocomplete="off">
               </div>
               <div class="form-block">
+                <!-- Entrada opcional para cantidad de subredes FLSM -->
                 <label for="cidr-subnets">Subredes (opcional)</label>
                 <input id="cidr-subnets" name="cidr-subnets" type="number" min="1" placeholder="Ej: 4, 8, 256..."
                   autocomplete="off">
               </div>
             </div>
 
+            <!-- Opcion para mostrar resultados en binario -->
             <label class="check">
               <input id="cidr-binary-toggle" type="checkbox">
               Mostrar representacion binaria
             </label>
 
+            <!-- Acciones principales del formulario -->
             <div class="form-actions">
               <button class="btn primary" type="submit">Calcular CIDR</button>
               <button class="btn ghost" type="button" id="cidr-example">Cargar ejemplo</button>
               <button class="btn subtle" type="button" id="cidr-clear">Limpiar</button>
             </div>
 
+            <!-- Contenedor de mensajes de estado para errores/avisos -->
             <div id="cidr-status" class="status" role="alert" aria-live="polite"></div>
           </form>
         </div>
 
+        <!-- Panel de resultados principales CIDR -->
         <div class="results panel" id="cidr-results" hidden style="margin-top: 24px;">
+          <!-- Encabezado con prefijo resultante -->
           <div class="results-header">
             <h3>Resultados CIDR</h3>
             <span class="chip" id="cidr-prefix-chip">/24</span>
           </div>
+          <!-- Lista de campos clave del calculo CIDR -->
           <dl class="result-list">
             <div class="result-item">
               <dt>Direccion de red</dt>
@@ -118,6 +150,7 @@
             </div>
           </dl>
 
+          <!-- Panel plegable con representacion binaria (se muestra si el toggle esta activo) -->
           <details id="cidr-binary" class="binary" hidden>
             <summary>Ver representacion binaria</summary>
             <div class="binary-grid">
@@ -146,11 +179,14 @@
 
 
 
+        <!-- Panel de subredes FLSM calculadas (opcional) -->
         <div class="results panel" id="cidr-subnet-results" hidden style="margin-top: 24px;">
+          <!-- Encabezado del bloque de subredes -->
           <div class="results-header">
             <h3>Subredes Generadas</h3>
             <span class="chip" id="cidr-subnet-count-chip">0</span>
           </div>
+          <!-- Resumen rapido de nueva mascara y hosts por subred -->
           <div class="result-list subnet-summary">
             <div class="result-item">
               <dt>Nueva Mascara</dt>
@@ -162,6 +198,7 @@
             </div>
           </div>
 
+          <!-- Tabla con el detalle de cada subred generada -->
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -175,12 +212,13 @@
                 </tr>
               </thead>
               <tbody id="cidr-subnet-rows">
-                <!-- Rows generated by JS -->
+                <!-- Filas generadas dinamicamente por JS -->
               </tbody>
             </table>
           </div>
         </div>
 
+        <!-- Mensaje inicial cuando no hay calculos -->
         <div class="empty" id="cidr-empty">
           <p>Ingresa una IP y una mascara para ver resultados.</p>
         </div>
@@ -190,6 +228,7 @@
 
   </div>
 
+  <!-- Script principal que inicializa la UI y la logica de calculo -->
   <script type="module" src="js/main.js"></script>
 </body>
 

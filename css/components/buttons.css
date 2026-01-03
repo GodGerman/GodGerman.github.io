@@ -1,3 +1,5 @@
+/* Botones: base y variantes */
+/* Boton base: tipografia, padding y layout */
 .btn {
     padding: 12px 24px;
     border-radius: var(--radius-sm);
@@ -15,12 +17,14 @@
     overflow: hidden;
 }
 
+/* Variante primaria: accion principal */
 .btn.primary {
     background: var(--primary);
     color: #fff;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+/* Hover de variante primaria */
 .btn.primary:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
@@ -28,12 +32,14 @@
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Variante ghost: contorno con color primario */
 .btn.ghost {
     background: rgba(59, 130, 246, 0.1);
     border-color: rgba(59, 130, 246, 0.4);
     color: var(--primary);
 }
 
+/* Hover de variante ghost */
 .btn.ghost:hover {
     background: rgba(59, 130, 246, 0.2);
     box-shadow: 0 0 15px var(--primary-glow);
@@ -41,24 +47,28 @@
     border-color: var(--primary);
 }
 
+/* Variante sutil para acciones secundarias */
 .btn.subtle {
     background: var(--surface-2);
     color: var(--muted);
     border: 1px solid var(--border);
 }
 
+/* Hover de variante sutil */
 .btn.subtle:hover {
     background: var(--border);
     color: var(--ink);
     border-color: var(--muted);
 }
 
+/* Variante de peligro para acciones destructivas */
 .btn.danger {
     background: rgba(239, 68, 68, 0.1);
     border-color: rgba(239, 68, 68, 0.4);
     color: var(--error);
 }
 
+/* Hover de variante de peligro */
 .btn.danger:hover {
     background: rgba(239, 68, 68, 0.2);
     box-shadow: 0 0 15px var(--error-glow);
@@ -66,7 +76,7 @@
     border-color: var(--error);
 }
 
-/* Active/Focus states */
+/* Estado activo: elimina desplazamiento */
 .btn:active {
     transform: translateY(0);
 }
