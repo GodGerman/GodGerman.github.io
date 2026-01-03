@@ -205,11 +205,22 @@ El proyecto usa JavaScript modular nativo y separa la logica de calculo del rend
 - Mensajes claros y consistentes en cada formulario.
 
 ## Pruebas
-Las pruebas unitarias cubren:
-- Conversion IP <-> entero.
-- Conversion prefijo <-> mascara.
-- Caso CIDR `192.168.10.0/24`.
-- Caso VLSM base `192.168.0.0/24` con `A=100`, `B=50`, `C=25`, `D=10`.
+- CIDR: `192.168.10.0/24` -> network `192.168.10.0`, host range `192.168.10.1-192.168.10.254`, broadcast `192.168.10.255`.
+- CIDR con mascara decimal: `10.0.0.1` + `255.255.255.0` -> network `10.0.0.0`, broadcast `10.0.0.255`.
+- CIDR /31 y /32: verificar que el rango de hosts sea `N/A` y `usableHosts = 0`.
+- FLSM: base `192.168.10.0/24` con `4` subredes -> nuevo prefijo `/26`, saltos de 64 direcciones.
+- FLSM no potencia de 2: base `192.168.10.0/24` con `3` subredes -> prefijo `/26` y solo 3 subredes generadas.
+- VLSM: base `192.168.0.0/24`, requerimientos `A=100`, `B=50`, `C=25`, `D=10`; mostrar asignacion de subredes y espacio restante.
+- Binario: Activar representacion binaria y comprobar coherencia entre IP, mascara, network y broadcast.
+
+Casos con error (validaciones):
+- Error CIDR: IP invalida `300.1.1.1/24` debe mostrar mensaje claro.
+- Error CIDR: Prefijo fuera de rango `/33` debe mostrar mensaje claro.
+- Error Mascara: `255.0.255.0` (no contigua) debe ser rechazada.
+- Error VLSM: Red base no alineada `192.168.1.10/24` debe indicar que no es direccion de red.
+- Error VLSM: Hosts `0` o negativos deben rechazarse.
+- Error VLSM: Suma de hosts que excede la red base (ej. `192.168.0.0/24` con `A=200`, `B=200`) debe mostrar “espacio insuficiente”.
+- Error FLSM: Subredes excesivas que superen el limite de UI (ej. `5000`) deben mostrar error de limite.
 
 ## Ejecucion local
 El proyecto se ejecuta con XAMPP usando Apache:
