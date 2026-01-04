@@ -209,7 +209,6 @@ El proyecto usa JavaScript modular nativo y separa la logica de calculo del rend
 - CIDR con mascara decimal: `10.0.0.1` + `255.255.255.0` -> network `10.0.0.0`, broadcast `10.0.0.255`.
 - CIDR /31 y /32: verificar que el rango de hosts sea `N/A` y `usableHosts = 0`.
 - FLSM: base `192.168.10.0/24` con `4` subredes -> nuevo prefijo `/26`, saltos de 64 direcciones.
-- FLSM no potencia de 2: base `192.168.10.0/24` con `3` subredes -> prefijo `/26` y solo 3 subredes generadas.
 - VLSM: base `192.168.0.0/24`, requerimientos `A=100`, `B=50`, `C=25`, `D=10`; mostrar asignacion de subredes y espacio restante.
 - Binario: Activar representacion binaria y comprobar coherencia entre IP, mascara, network y broadcast.
 
