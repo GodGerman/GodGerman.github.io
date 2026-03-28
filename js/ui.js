@@ -1,697 +1,365 @@
-/**
- * Capa de UI para calculadoras CIDR y VLSM.
- *
- * Orquesta eventos del DOM, valida entradas con utilidades y renderiza resultados.
- * Este modulo tiene efectos secundarios sobre el DOM.
- */
-import {
-  formatBinaryIp,
-  formatIp,
-  isNetworkAddress,
-  parseCidrInput,
-  parseIp,
-  parseMask,
-  prefixToMask,
-} from "./ip-utils.js";
-import { computeCidr, computeSubnets } from "./cidr.js";
-import { computeVlsm } from "./vlsm.js";
-import { runTests } from "./tests.js";
+export class UIHandler {
+    constructor(api, treeRenderer) {
+        this.api = api;
+        this.treeRenderer = treeRenderer;
 
-/**
- * Actualiza el mensaje de estado del formulario.
- *
- * @param {HTMLElement} element - Contenedor del mensaje.
- * @param {string|null} type - Tipo de estado ("error", "warning", etc.).
- * @param {string|null} message - Texto del mensaje o null para limpiar.
- * @returns {void}
- * Flujo:
- * - Si no hay mensaje, limpia texto y atributo data-type.
- * - Si hay mensaje, actualiza el texto y el tipo.
- * Efectos secundarios: muta el DOM.
- */
-function setStatus(element, type, message) {
-  // Cuando no hay mensaje, limpia el estado visual.
-  if (!message) {
-    element.textContent = "";
-    element.removeAttribute("data-type");
-    return;
-  }
+        // Edit mode tracking
+        this._editingMember = null; // null = new, object = editing
 
-  // Caso normal: asigna mensaje y tipo para estilos.
-  element.textContent = message;
-  element.setAttribute("data-type", type);
-}
+        // Elements
+        this.modal = document.getElementById('member-modal');
+        this.modalTitle = document.querySelector('#member-modal .modal-header h2');
+        this.addBtn = document.getElementById('add-member-btn');
+        this.closeBtn = document.getElementById('close-modal-btn');
+        this.form = document.getElementById('member-form');
+        this.saveBtn = document.getElementById('save-member-btn');
+        this.fallecidoCheckbox = document.getElementById('fallecido');
+        this.deathDateGroup = document.getElementById('death-date-group');
+        this.deathDateInput = document.getElementById('fechaFallecimiento');
 
-/**
- * Parsea un entero no negativo en formato decimal estricto.
- *
- * @param {string|number} value - Valor crudo de entrada.
- * @returns {number|null} Entero no negativo o null si es invalido.
- * Flujo:
- * - Normaliza a string y valida con regex.
- * - Convierte a numero y verifica seguridad de rango.
- * Efectos secundarios: ninguno.
- */
-function parseStrictInt(value) {
-  if (value === null || value === undefined) return null;
-  const trimmed = String(value).trim();
-  if (!trimmed) return null;
-  if (!/^\d+$/.test(trimmed)) return null;
+        this.selectPadre = document.getElementById('idPadre');
+        this.selectMadre = document.getElementById('idMadre');
+        this.selectPareja = document.getElementById('idPareja');
+        this.selectSexo = document.getElementById('sexo');
 
-  const parsed = Number(trimmed);
-  if (!Number.isSafeInteger(parsed)) return null;
+        this.infoModal = document.getElementById('info-modal');
+        this.closeInfoBtn = document.getElementById('close-info-btn');
+        this.infoContent = document.getElementById('info-content');
 
-  return parsed;
-}
-
-/**
- * Inicializa la calculadora CIDR y enlaza eventos del formulario.
- * No recibe parametros.
- *
- * @returns {void}
- * Flujo:
- * - Obtiene nodos del DOM.
- * - Declara helpers internos (vista, ejemplo, calculo).
- * - Registra handlers para acciones del usuario.
- * Efectos secundarios: registra listeners y actualiza el DOM.
- */
-export function initCidrCalculator() {
-  // Referencias a nodos principales del formulario CIDR.
-  const form = document.getElementById("cidr-form");
-  const combinedInput = document.getElementById("cidr-combined");
-  const ipInput = document.getElementById("cidr-ip");
-  const maskInput = document.getElementById("cidr-mask");
-  const binaryToggle = document.getElementById("cidr-binary-toggle");
-  const statusEl = document.getElementById("cidr-status");
-  const resultsEl = document.getElementById("cidr-results");
-  const emptyEl = document.getElementById("cidr-empty");
-  const binaryEl = document.getElementById("cidr-binary");
-  const exampleBtn = document.getElementById("cidr-example");
-  const clearBtn = document.getElementById("cidr-clear");
-  const subnetsInput = document.getElementById("cidr-subnets");
-
-  // Campos de salida para el resumen CIDR.
-  // Cada propiedad apunta a un nodo donde se imprime el resultado.
-  const fields = {
-    network: document.getElementById("cidr-network"),
-    hostRange: document.getElementById("cidr-host-range"),
-    broadcast: document.getElementById("cidr-broadcast"),
-    maskDec: document.getElementById("cidr-mask-dec"),
-    maskPrefix: document.getElementById("cidr-mask-prefix"),
-    hosts: document.getElementById("cidr-hosts"),
-    total: document.getElementById("cidr-total"),
-    wildcard: document.getElementById("cidr-wildcard"),
-    chip: document.getElementById("cidr-prefix-chip"),
-    binIp: document.getElementById("cidr-bin-ip"),
-    binMask: document.getElementById("cidr-bin-mask"),
-    binNetwork: document.getElementById("cidr-bin-network"),
-    binBroadcast: document.getElementById("cidr-bin-broadcast"),
-  };
-
-  // Elementos usados para resultados de subredes FLSM.
-  // Incluye el contenedor, la tabla y los campos de resumen.
-  const subnetElements = {
-    container: document.getElementById("cidr-subnet-results"),
-    rows: document.getElementById("cidr-subnet-rows"),
-    chip: document.getElementById("cidr-subnet-count-chip"),
-    newMask: document.getElementById("cidr-new-mask"),
-    subnetHosts: document.getElementById("cidr-subnet-hosts"),
-  };
-
-  // Estado actual de la vista: "empty", "summary" o "subnets".
-  // Se usa para saber que paneles mostrar y si el binario aplica.
-  let cidrView = "empty";
-
-  /**
-   * Controla que paneles se muestran segun el estado actual.
-   *
-   * @param {string} view - "empty", "summary" o "subnets".
-   * @returns {void}
-   * Flujo:
-   * - Guarda el estado actual.
-   * - Alterna visibilidad de resumen, subredes y panel binario.
-   * Efectos secundarios: muta el DOM.
-   */
-  function setCidrView(view) {
-    cidrView = view;
-    const showSummary = view === "summary" || view === "subnets";
-    const showSubnets = view === "subnets";
-
-    resultsEl.hidden = !showSummary;
-    subnetElements.container.hidden = !showSubnets;
-    if (emptyEl) emptyEl.hidden = showSummary || showSubnets;
-    if (binaryEl) binaryEl.hidden = showSummary ? !binaryToggle.checked : true;
-  }
-
-  /**
-   * Limpia el formulario y restablece la vista inicial.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo:
-   * - Resetea inputs y toggles.
-   * - Limpia subredes y estado.
-   * Efectos secundarios: muta el DOM.
-   */
-  function clearForm() {
-    combinedInput.value = "";
-    ipInput.value = "";
-    maskInput.value = "";
-    binaryToggle.checked = false;
-    subnetsInput.value = "";
-    setCidrView("empty");
-    setStatus(statusEl, null, null);
-  }
-
-  /**
-   * Carga un ejemplo en el campo CIDR combinado.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo:
-   * - Establece el ejemplo.
-   * - Limpia el resto de campos para evitar ambiguedad.
-   * Efectos secundarios: muta el DOM.
-   */
-  function handleExampleClick() {
-    combinedInput.value = "192.168.10.0/24";
-    ipInput.value = "";
-    maskInput.value = "";
-  }
-
-  // Limpia todos los campos del formulario CIDR.
-  clearBtn.addEventListener("click", clearForm);
-
-  /**
-   * Alterna la vista binaria segun el estado actual.
-   *
-   * @param {Event} event - Evento change del checkbox (no se usa).
-   * @returns {void}
-   * Flujo:
-   * - Verifica la vista actual y el estado del toggle.
-   * - Actualiza la visibilidad del panel binario.
-   * Efectos secundarios: muta el DOM.
-   */
-  function handleBinaryToggleChange(event) {
-    const showSummary = cidrView === "summary" || cidrView === "subnets";
-    binaryEl.hidden = showSummary ? !binaryToggle.checked : true;
-  }
-
-  /**
-   * Ejecuta el flujo CIDR principal: validacion, calculo y render.
-   *
-   * @param {SubmitEvent} event - Evento submit del formulario.
-   * @returns {void}
-   * Flujo:
-   * - Parsea entradas (prioriza CIDR combinado).
-   * - Calcula CIDR y muestra resumen.
-   * - Si se solicita, calcula subredes FLSM y renderiza tabla.
-   * Efectos secundarios: actualiza mensajes y resultados en el DOM.
-   */
-  function handleCidrSubmit(event) {
-    event.preventDefault();
-    setStatus(statusEl, null, null);
-
-    let ipArr = null;
-    let prefix = null;
-
-    // Prioriza el campo combinado; si no, acepta IP/prefijo en el campo IP.
-    if (combinedInput.value.trim()) {
-      const parsed = parseCidrInput(combinedInput.value);
-      if (!parsed) {
-        setStatus(statusEl, "error", "Formato CIDR invalido. Usa IP/prefijo.");
-        setCidrView("empty");
-        return;
-      }
-      ipArr = parsed.ipArr;
-      prefix = parsed.prefix;
-    } else if (ipInput.value.trim().includes("/")) {
-      const parsed = parseCidrInput(ipInput.value);
-      if (!parsed) {
-        setStatus(statusEl, "error", "Formato CIDR invalido en direccion IP.");
-        setCidrView("empty");
-        return;
-      }
-      ipArr = parsed.ipArr;
-      prefix = parsed.prefix;
-    } else {
-      // Caso tradicional: IP y mascara por separado.
-      ipArr = parseIp(ipInput.value);
-      if (!ipArr) {
-        setStatus(statusEl, "error", "Direccion IP invalida.");
-        setCidrView("empty");
-        return;
-      }
-      prefix = parseMask(maskInput.value);
-      if (prefix === null) {
-        setStatus(statusEl, "error", "Mascara invalida. Usa prefijo o decimal punteada.");
-        setCidrView("empty");
-        return;
-      }
+        this.initEventListeners();
     }
 
-    // Ejecuta el calculo CIDR con la IP y el prefijo resultantes.
-    const result = computeCidr(ipArr, prefix);
-    if (result.error) {
-      setStatus(statusEl, "error", result.error);
-      setCidrView("empty");
-      return;
+    initEventListeners() {
+        this.addBtn.addEventListener('click', () => this.openModal());
+        this.closeBtn.addEventListener('click', () => this.closeModal());
+        
+        this.closeInfoBtn.addEventListener('click', () => this.closeInfoModal());
+
+        // Cierra condicional clickeando fuera del contenido
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.closeModal();
+            }
+        });
+
+        this.infoModal.addEventListener('click', (e) => {
+            if (e.target === this.infoModal) {
+                this.closeInfoModal();
+            }
+        });
+
+        // Initialize flatpickr on date inputs
+        this.dpNacimiento = flatpickr("#fechaNacimiento", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
+        
+        this.dpFallecimiento = flatpickr("#fechaFallecimiento", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
+
+        this.fallecidoCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                this.deathDateGroup.classList.remove('hidden');
+                this.deathDateInput.setAttribute('required', 'true');
+            } else {
+                this.deathDateGroup.classList.add('hidden');
+                this.deathDateInput.removeAttribute('required');
+                this.dpFallecimiento.clear();
+            }
+        });
+
+        this.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleFormSubmit();
+        });
+
+        this.selectSexo.addEventListener('change', () => {
+            this.updateParejaOptions(this._editingMember ? this._editingMember.id : null);
+        });
     }
 
-    // Construye rango de hosts (o N/A si no aplica).
-    // En /31 y /32 no hay rango utilizable.
-    const range = result.firstHost && result.lastHost
-      ? `${formatIp(result.firstHost)} - ${formatIp(result.lastHost)}`
-      : "N/A";
+    populateSelects(excludeId = null) {
+        this.selectPadre.innerHTML = '<option value="">Ninguno</option>';
+        this.selectMadre.innerHTML = '<option value="">Ninguna</option>';
 
-    // Renderiza resumen CIDR en el panel principal.
-    fields.network.textContent = formatIp(result.network);
-    fields.hostRange.textContent = range;
-    fields.broadcast.textContent = formatIp(result.broadcast);
-    fields.maskDec.textContent = formatIp(result.mask);
-    fields.maskPrefix.textContent = `/${result.prefix}`;
-    fields.hosts.textContent = result.usableHosts;
-    fields.total.textContent = result.totalAddresses;
-    fields.wildcard.textContent = formatIp(result.wildcard);
-    fields.chip.textContent = `/${result.prefix}`;
+        const members = this.api.members;
 
-    // Renderiza la vista binaria (si se solicita).
-    fields.binIp.textContent = formatBinaryIp(result.ip);
-    fields.binMask.textContent = formatBinaryIp(result.mask);
-    fields.binNetwork.textContent = formatBinaryIp(result.network);
-    fields.binBroadcast.textContent = formatBinaryIp(result.broadcast);
+        members.forEach(m => {
+            // No incluir al miembro que se está editando en las opciones
+            if (excludeId && m.id === excludeId) return;
 
-    // Logica de subredes FLSM (opcional).
-    const subnetsValue = subnetsInput.value.trim();
-    if (subnetsValue) {
-      const desiredSubnets = parseStrictInt(subnetsValue);
-      if (desiredSubnets === null || desiredSubnets < 0) {
-        setStatus(statusEl, "error", "Cantidad de subredes invalida. Usa un entero mayor o igual a 0.");
-        setCidrView("summary");
-        return;
-      }
+            const option = `<option value="${m.id}">${m.nombre} ${m.apellido}</option>`;
+            
+            if (m.sexo === 'M') {
+                 this.selectPadre.insertAdjacentHTML('beforeend', option);
+            } else if (m.sexo === 'F') {
+                 this.selectMadre.insertAdjacentHTML('beforeend', option);
+            } else {
+                this.selectPadre.insertAdjacentHTML('beforeend', option);
+                this.selectMadre.insertAdjacentHTML('beforeend', option);
+            }
+        });
 
-      // Advierte si la IP ingresada no es direccion de red.
-      if (!isNetworkAddress(ipArr, prefix)) {
-        setStatus(
-          statusEl,
-          "warning",
-          "Nota: La IP ingresada no es direccion de red, se usara la red base calculada para las subredes."
-        );
-      }
-
-      // Calcula subredes FLSM y valida errores.
-      const subnetResult = computeSubnets(result.network, prefix, desiredSubnets);
-
-      if (subnetResult.error) {
-        setStatus(statusEl, "error", subnetResult.error);
-        setCidrView("summary");
-        return;
-      }
-
-      // Actualiza el resumen de subredes.
-      subnetElements.chip.textContent = subnetResult.subnets.length;
-      subnetElements.newMask.textContent = `/${subnetResult.newPrefix} (${formatIp(prefixToMask(subnetResult.newPrefix))})`;
-      subnetElements.subnetHosts.textContent = subnetResult.subnets.length > 0
-        ? subnetResult.subnets[0].usableHosts
-        : "-";
-
-      // Limpia filas existentes antes de renderizar.
-      subnetElements.rows.innerHTML = "";
-
-      // Renderiza cada subred calculada en la tabla (con fragmento para eficiencia).
-      const fragment = document.createDocumentFragment();
-      // Callback: sub (datos de subred), index (orden); no retorna valor, muta el DOM.
-      subnetResult.subnets.forEach((sub, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td class="mono">${formatIp(sub.network)}/${sub.prefix}</td>
-            <td class="mono">${sub.firstHost ? formatIp(sub.firstHost) : "N/A"}</td>
-            <td class="mono">${sub.lastHost ? formatIp(sub.lastHost) : "N/A"}</td>
-            <td class="mono">${formatIp(sub.broadcast)}</td>
-            <td class="mono">${formatIp(sub.mask)}</td>
-          `;
-        fragment.appendChild(tr);
-      });
-
-      subnetElements.rows.appendChild(fragment);
-      setCidrView("subnets");
-    } else {
-      // Si no se solicitan subredes, solo muestra el resumen CIDR.
-      setCidrView("summary");
+        this.updateParejaOptions(excludeId);
     }
-  }
 
-  // Enlaza handlers documentados para las acciones principales.
-  exampleBtn.addEventListener("click", handleExampleClick);
-  binaryToggle.addEventListener("change", handleBinaryToggleChange);
-  form.addEventListener("submit", handleCidrSubmit);
-}
+    updateParejaOptions(excludeId = null) {
+        const previousValue = this.selectPareja.value;
+        const currentSexo = this.selectSexo.value;
 
-/**
- * Inicializa la calculadora VLSM y enlaza eventos del formulario.
- * No recibe parametros.
- *
- * @returns {void}
- * Flujo:
- * - Obtiene nodos del DOM.
- * - Define helpers internos para filas y validacion.
- * - Registra handlers de UI.
- * Efectos secundarios: registra listeners y actualiza el DOM.
- */
-export function initVlsmCalculator() {
-  // Referencias a nodos principales del formulario VLSM.
-  const form = document.getElementById("vlsm-form");
-  const baseInput = document.getElementById("vlsm-base");
-  const statusEl = document.getElementById("vlsm-status");
-  const resultsEl = document.getElementById("vlsm-results");
+        this.selectPareja.innerHTML = '<option value="">Ninguna</option>';
 
-  const rowsBody = document.getElementById("vlsm-rows");
-  const template = document.getElementById("vlsm-row-template");
-  const addRowBtn = document.getElementById("vlsm-add-row");
-  const exampleBtn = document.getElementById("vlsm-example");
-  const clearBtn = document.getElementById("vlsm-clear");
+        this.api.members.forEach(m => {
+            if (excludeId && m.id === excludeId) return;
 
-  // Campos de resumen y resultados VLSM.
-  // Cada propiedad apunta a un nodo de salida en la UI.
-  const summary = {
-    baseNetwork: document.getElementById("vlsm-base-network"),
-    baseMask: document.getElementById("vlsm-base-mask"),
-    baseHosts: document.getElementById("vlsm-base-hosts"),
-    baseTotal: document.getElementById("vlsm-base-total"),
-    requestedHosts: document.getElementById("vlsm-requested-hosts"),
-    usedAddresses: document.getElementById("vlsm-used-addresses"),
-    remainingAddresses: document.getElementById("vlsm-remaining-addresses"),
-    remainingHosts: document.getElementById("vlsm-remaining-hosts"),
-    remainingRange: document.getElementById("vlsm-remaining-range"),
-    chip: document.getElementById("vlsm-base-chip"),
-  };
+            // Mostrar solo personas del sexo opuesto (u otros)
+            if (currentSexo === 'M' && m.sexo === 'M') return;
+            if (currentSexo === 'F' && m.sexo === 'F') return;
 
-  /**
-   * Agrega una fila editable para subredes VLSM.
-   *
-   * @param {string} name - Nombre sugerido de la subred.
-   * @param {string|number} hosts - Hosts requeridos sugeridos.
-   * @returns {void}
-   * Flujo:
-   * - Clona la plantilla de fila.
-   * - Asigna valores por defecto.
-   * - Registra el boton de eliminar.
-   * Efectos secundarios: inserta nodos en la tabla.
-   */
-  function addRow(name = "", hosts = "") {
-    const row = template.content.cloneNode(true);
-    const nameInput = row.querySelector(".vlsm-name");
-    const hostInput = row.querySelector(".vlsm-hosts");
-    const removeBtn = row.querySelector(".vlsm-remove");
+            const option = `<option value="${m.id}">${m.nombre} ${m.apellido}</option>`;
+            this.selectPareja.insertAdjacentHTML('beforeend', option);
+        });
 
-    nameInput.value = name;
-    hostInput.value = hosts;
+        if (previousValue) {
+            this.selectPareja.value = previousValue;
+        }
+    }
+
+    openModal(member = null) {
+        this._editingMember = member;
+        this.form.reset();
+        this.dpNacimiento.clear();
+        this.dpFallecimiento.clear();
+        this.fallecidoCheckbox.checked = false;
+        this.fallecidoCheckbox.dispatchEvent(new Event('change'));
+
+        if (member) {
+            // Edit mode — pre-fill form fields
+            this.modalTitle.textContent = 'Editar Miembro';
+            this.saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Actualizar';
+            
+            this.selectSexo.value = member.sexo || ''; // assign before populate to filter spouse dropdown
+            this.populateSelects(member.id);
+
+            document.getElementById('nombre').value = member.nombre || '';
+            document.getElementById('apellido').value = member.apellido || '';
+
+            if (member.fechaNacimiento) {
+                this.dpNacimiento.setDate(member.fechaNacimiento);
+            }
+
+            if (member.fallecido) {
+                this.fallecidoCheckbox.checked = true;
+                this.fallecidoCheckbox.dispatchEvent(new Event('change'));
+                if (member.fechaFallecimiento) {
+                    this.dpFallecimiento.setDate(member.fechaFallecimiento);
+                }
+            }
+
+            this.selectPadre.value = member.idPadre || '';
+            this.selectMadre.value = member.idMadre || '';
+            this.selectPareja.value = member.idPareja || '';
+        } else {
+            // Add mode
+            this.modalTitle.textContent = 'Nuevo Miembro';
+            this.saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Guardar';
+            this.selectSexo.value = '';
+            this.populateSelects();
+        }
+
+        this.modal.classList.remove('hidden');
+    }
+
+    closeModal() {
+        this._editingMember = null;
+        this.modal.classList.add('hidden');
+    }
+
+    async handleFormSubmit() {
+        const formData = new FormData(this.form);
+        const memberData = {
+            nombre: formData.get('nombre'),
+            apellido: formData.get('apellido'),
+            sexo: formData.get('sexo'),
+            fechaNacimiento: formData.get('fechaNacimiento') || null,
+            fallecido: this.fallecidoCheckbox.checked,
+            fechaFallecimiento: this.fallecidoCheckbox.checked ? formData.get('fechaFallecimiento') : null,
+            idPadre: formData.get('idPadre') || null,
+            idMadre: formData.get('idMadre') || null,
+            idPareja: formData.get('idPareja') || null
+        };
+
+        let result;
+        if (this._editingMember) {
+            // Update existing
+            memberData.id = this._editingMember.id;
+            result = await this.api.updateMember(memberData);
+        } else {
+            // Add new
+            result = await this.api.addMember(memberData);
+        }
+
+        if (result.success) {
+            this.closeModal();
+            this.treeRenderer.render(this.api.members);
+        }
+    }
+
+    closeInfoModal() {
+        this.infoModal.classList.add('hidden');
+    }
 
     /**
-     * Elimina la fila actual si hay mas de una en la tabla.
-     *
-     * @param {MouseEvent} event - Evento click del boton quitar.
-     * @returns {void}
-     * Flujo:
-     * - Evita el submit.
-     * - Elimina la fila si existe mas de una.
-     * Efectos secundarios: muta el DOM.
+     * Convierte una fecha de yyyy-mm-dd a dd/mm/yyyy para mostrar al usuario.
      */
-    function handleRemoveClick(event) {
-      event.preventDefault();
-      const tr = removeBtn.closest("tr");
-      if (rowsBody.children.length > 1) {
-        tr.remove();
-      }
+    formatDate(dateStr) {
+        if (!dateStr) return 'Desconocida';
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
-    removeBtn.addEventListener("click", handleRemoveClick);
+    calcularDetalles(m) {
+        if (!m.fechaNacimiento) return null;
+        const born = new Date(m.fechaNacimiento);
+        born.setMinutes(born.getMinutes() + born.getTimezoneOffset());
+        
+        const now = new Date();
+        const death = m.fallecido && m.fechaFallecimiento ? new Date(m.fechaFallecimiento) : null;
+        if (death) death.setMinutes(death.getMinutes() + death.getTimezoneOffset());
 
-    rowsBody.appendChild(row);
-  }
+        const calcObj = (start, end) => {
+            let a = end.getFullYear() - start.getFullYear();
+            const mdiff = end.getMonth() - start.getMonth();
+            if (mdiff < 0 || (mdiff === 0 && end.getDate() < start.getDate())) a--;
+            return a;
+        };
 
-  /**
-   * Elimina todas las filas de subredes en pantalla.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo: limpia el contenedor de filas.
-   * Efectos secundarios: muta el DOM.
-   */
-  function clearRows() {
-    rowsBody.innerHTML = "";
-  }
-
-  /**
-   * Restablece el formulario VLSM a su estado inicial.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo:
-   * - Limpia campos.
-   * - Reinicia filas por defecto.
-   * - Oculta resultados.
-   * Efectos secundarios: muta el DOM.
-   */
-  function resetForm() {
-    baseInput.value = "";
-    clearRows();
-    addRow();
-    addRow();
-    setStatus(statusEl, null, null);
-    setStatus(statusEl, null, null);
-    resultsEl.hidden = true;
-  }
-
-  // Estado inicial: dos filas de subredes.
-  addRow();
-  addRow();
-
-  /**
-   * Agrega una fila adicional de subredes en la tabla.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo: delega en addRow para crear una nueva fila vacia.
-   * Efectos secundarios: muta el DOM.
-   */
-  function handleAddRowClick() {
-    addRow();
-  }
-
-  // Limpia el formulario VLSM.
-  clearBtn.addEventListener("click", resetForm);
-
-  /**
-   * Carga un ejemplo predefinido de subredes.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo:
-   * - Establece red base.
-   * - Reinicia filas.
-   * - Carga datos ejemplo.
-   * Efectos secundarios: muta el DOM.
-   */
-  function handleVlsmExampleClick() {
-    baseInput.value = "192.168.0.0/24";
-    clearRows();
-    addRow("A", 100);
-    addRow("B", 50);
-    addRow("C", 25);
-    addRow("D", 10);
-  }
-
-  /**
-   * Maneja el calculo VLSM: validacion, asignacion y render.
-   *
-   * @param {SubmitEvent} event - Evento submit del formulario.
-   * @returns {void}
-   * Flujo:
-   * - Valida red base.
-   * - Recopila filas y valida hosts.
-   * - Ejecuta el algoritmo VLSM.
-   * - Renderiza resumen y tabla.
-   * Efectos secundarios: actualiza mensajes y resultados en el DOM.
-   */
-  function handleVlsmSubmit(event) {
-    event.preventDefault();
-    setStatus(statusEl, null, null);
-
-    // Valida la red base en formato CIDR.
-    const parsedBase = parseCidrInput(baseInput.value);
-    if (!parsedBase) {
-      setStatus(statusEl, "error", "Red base invalida. Usa formato IP/prefijo.");
-      resultsEl.hidden = true;
-      return;
+        if (m.fallecido && death) {
+            return {
+                edadFallecimiento: calcObj(born, death),
+                aniosFallecido: calcObj(death, now)
+            };
+        } else if (!m.fallecido) {
+            return {
+                edadActual: calcObj(born, now)
+            };
+        }
+        return null;
     }
 
-    // La red base debe ser direccion de red, no un host.
-    if (!isNetworkAddress(parsedBase.ipArr, parsedBase.prefix)) {
-      const baseCidr = computeCidr(parsedBase.ipArr, parsedBase.prefix);
-      setStatus(
-        statusEl,
-        "error",
-        `La IP base no es direccion de red. Usa ${formatIp(baseCidr.network)} /${parsedBase.prefix}.`
-      );
-      resultsEl.hidden = true;
-      return;
+    openInfoModal(member) {
+        this._currentInfoMember = member;
+        const detalles = this.calcularDetalles(member);
+        const iconSexo = member.sexo === 'M' ? 'Masculino' : (member.sexo === 'F' ? 'Femenino' : 'Otro');
+        
+        let html = `
+            <div class="info-item">
+                <strong>Nombre Completo</strong>
+                <span>${member.nombre} ${member.apellido}</span>
+            </div>
+            <div class="info-item">
+                <strong>Sexo</strong>
+                <span>${iconSexo}</span>
+            </div>
+            <div class="info-item">
+                <strong>Fecha Nacimiento</strong>
+                <span>${this.formatDate(member.fechaNacimiento)}</span>
+            </div>
+        `;
+
+        if (!member.fallecido && detalles && detalles.edadActual !== undefined) {
+             html += `
+             <div class="info-item">
+                 <strong>Edad Actual</strong>
+                 <span>${detalles.edadActual} años</span>
+             </div>
+             `;
+        }
+
+        if (member.fallecido) {
+            html += `
+            <div class="info-item">
+                <strong>Fecha de Fallecimiento</strong>
+                <span>${this.formatDate(member.fechaFallecimiento)}</span>
+            </div>
+            `;
+            if (detalles && detalles.edadFallecimiento !== undefined) {
+                html += `
+                <div class="info-item" style="color: var(--danger-color);">
+                    <strong>Falleció a la Edad de</strong>
+                    <span>${detalles.edadFallecimiento} años</span>
+                </div>
+                `;
+            }
+            if (detalles && detalles.aniosFallecido !== undefined) {
+                html += `
+                <div class="info-item">
+                    <strong>Años Transcurridos</strong>
+                    <span>${detalles.aniosFallecido} año(s)</span>
+                </div>
+                `;
+            }
+        }
+
+        // Relaciones familiares
+        const findName = (id) => {
+            if (!id) return null;
+            const m = this.api.members.find(x => x.id === id);
+            return m ? `${m.nombre} ${m.apellido}`.trim() : null;
+        };
+
+        const padre = findName(member.idPadre);
+        const madre = findName(member.idMadre);
+        const pareja = findName(member.idPareja);
+
+        if (padre || madre || pareja) {
+            html += `<div class="info-item" style="border-bottom: none; margin-bottom: 0.4rem; padding-bottom: 0.4rem;"><strong style="color: var(--primary-color); text-transform: none; font-size: 0.95rem;">Relaciones</strong></div>`;
+        }
+
+        if (padre) {
+            html += `
+            <div class="info-item">
+                <strong>Padre</strong>
+                <span>${padre}</span>
+            </div>`;
+        }
+        if (madre) {
+            html += `
+            <div class="info-item">
+                <strong>Madre</strong>
+                <span>${madre}</span>
+            </div>`;
+        }
+        if (pareja) {
+            html += `
+            <div class="info-item">
+                <strong>Pareja / Cónyuge</strong>
+                <span>${pareja}</span>
+            </div>`;
+        }
+
+        // Botón de editar
+        html += `
+        <div class="form-actions" style="margin-top: 1.25rem;">
+            <button type="button" id="edit-member-btn" class="edit-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Editar
+            </button>
+        </div>`;
+
+        this.infoContent.innerHTML = html;
+
+        // Bind edit button
+        document.getElementById('edit-member-btn').addEventListener('click', () => {
+            this.closeInfoModal();
+            this.openModal(member);
+        });
+
+        this.infoModal.classList.remove('hidden');
     }
-
-    // Recopila y valida filas de subredes con hosts.
-    const subnets = [];
-    const rows = Array.from(rowsBody.querySelectorAll("tr"));
-
-    // Recorre cada fila para construir la solicitud de subredes.
-    // Callback: row (fila DOM), index (posicion); no retorna valor y puede mutar subnets/status.
-    rows.forEach((row, index) => {
-      const nameInput = row.querySelector(".vlsm-name");
-      const hostInput = row.querySelector(".vlsm-hosts");
-      const nameValue = nameInput.value.trim();
-      const hostValue = hostInput.value.trim();
-
-      // Ignora filas completamente vacias.
-      if (!nameValue && !hostValue) return;
-
-      const hosts = parseStrictInt(hostValue);
-      if (hosts === null || hosts <= 0) {
-        setStatus(statusEl, "error", `Hosts invalidos en la fila ${index + 1}.`);
-        return;
-      }
-
-      subnets.push({
-        name: nameValue || `Subred ${index + 1}`,
-        hosts,
-      });
-    });
-
-    if (!subnets.length) {
-      setStatus(statusEl, "error", "Agrega al menos una subred con hosts requeridos.");
-      resultsEl.hidden = true;
-      return;
-    }
-
-    // Si hubo errores en filas, se detiene el flujo antes del calculo.
-    if (statusEl.getAttribute("data-type") === "error") {
-      resultsEl.hidden = true;
-      return;
-    }
-
-    // Ejecuta el algoritmo VLSM y muestra resultados.
-    const result = computeVlsm(parsedBase.ipArr, parsedBase.prefix, subnets);
-    if (result.error) {
-      setStatus(statusEl, "error", result.error);
-      resultsEl.hidden = true;
-      return;
-    }
-
-    // Suma hosts solicitados para el resumen.
-    // Callback reduce: acc (acumulado), item (subred); retorna el nuevo total.
-    const requestedHosts = subnets.reduce((acc, item) => acc + item.hosts, 0);
-
-    summary.baseNetwork.textContent = `${formatIp(result.base.network)} /${result.base.prefix}`;
-    summary.baseMask.textContent = formatIp(result.base.mask);
-    summary.baseHosts.textContent = result.base.usableHosts;
-    summary.baseTotal.textContent = result.base.totalAddresses;
-    summary.requestedHosts.textContent = requestedHosts;
-    summary.usedAddresses.textContent = result.usedAddresses;
-    summary.remainingAddresses.textContent = result.remaining.addresses;
-    summary.remainingHosts.textContent = result.remaining.hosts;
-    summary.remainingRange.textContent = result.remaining.range
-      ? `${formatIp(result.remaining.range.start)} - ${formatIp(result.remaining.range.end)}`
-      : "0";
-    summary.chip.textContent = `/${result.base.prefix}`;
-
-    const tbody = document.getElementById("vlsm-results-body");
-    tbody.innerHTML = "";
-
-    // Renderiza cada asignacion VLSM en la tabla.
-    // Callback: allocation (bloque asignado); no retorna valor, muta el DOM.
-    result.allocations.forEach((allocation) => {
-      const row = document.createElement("tr");
-      const maskLabel = formatIp(allocation.mask);
-      const hostRange = `${formatIp(allocation.firstHost)} - ${formatIp(allocation.lastHost)}`;
-
-      row.innerHTML = `
-        <td>${allocation.name}</td>
-        <td>${allocation.requiredHosts}</td>
-        <td>${allocation.neededHosts}</td>
-        <td class="mono">${formatIp(allocation.network)}/${allocation.prefix}</td>
-        <td class="mono">${maskLabel}</td>
-        <td class="mono">${hostRange}</td>
-        <td class="mono">${formatIp(allocation.broadcast)}</td>
-        <td>${allocation.usableHosts}</td>
-        <td>${allocation.wasted}</td>
-      `;
-
-      tbody.appendChild(row);
-    });
-
-    resultsEl.hidden = false;
-  }
-
-  // Enlaza handlers documentados para la UI VLSM.
-  addRowBtn.addEventListener("click", handleAddRowClick);
-  exampleBtn.addEventListener("click", handleVlsmExampleClick);
-  form.addEventListener("submit", handleVlsmSubmit);
-}
-
-/**
- * Inicializa el boton para ejecutar pruebas y mostrar el reporte.
- * No recibe parametros.
- *
- * @returns {void}
- * Flujo: enlaza el handler de pruebas a la UI.
- * Efectos secundarios: agrega listener y muta el DOM.
- */
-export function initTestRunner() {
-  const button = document.getElementById("run-tests");
-  const output = document.getElementById("test-results");
-
-  /**
-   * Ejecuta pruebas unitarias en memoria y muestra el resumen.
-   * No recibe parametros.
-   *
-   * @returns {void}
-   * Flujo:
-   * - Ejecuta runTests.
-   * - Construye lineas de reporte legibles.
-   * - Actualiza el texto de salida.
-   * Efectos secundarios: muta el DOM.
-   */
-  function handleRunTests() {
-    const report = runTests();
-
-    // Convierte cada resultado en una linea legible del reporte.
-    // Callback map: item (resultado de prueba); retorna la linea de texto.
-    const lines = report.results.map((item) => {
-      const status = item.pass ? "OK" : "FAIL";
-      return `${status} - ${item.name} | actual: ${item.actual} | esperado: ${item.expected}`;
-    });
-
-    output.textContent = [
-      `Pruebas ejecutadas: ${report.results.length}`,
-      `Aprobadas: ${report.passed}`,
-      `Fallidas: ${report.failed}`,
-      "",
-      ...lines,
-    ].join("\n");
-  }
-
-  button.addEventListener("click", handleRunTests);
-}
-
-/**
- * Inicializa valores por defecto en la interfaz.
- * No recibe parametros.
- *
- * @returns {void}
- * Flujo: establece nota informativa para VLSM si existe.
- * Efectos secundarios: muta el DOM.
- */
-export function initDefaults() {
-  const note = document.getElementById("vlsm-note");
-  if (note) note.value = "Se ordena por hosts requeridos de mayor a menor";
 }

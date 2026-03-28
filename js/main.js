@@ -1,45 +1,19 @@
-/**
- * Punto de entrada de la aplicacion web.
- *
- * Este archivo decide que modulos de UI activar en funcion del HTML presente.
- * Eso permite reutilizar el mismo bundle JS en las paginas de CIDR y VLSM.
- */
-import {
-  initCidrCalculator,
-  initDefaults,
-  initTestRunner,
-  initVlsmCalculator,
-} from "./ui.js";
+import { FamiliaAPI } from './api.js';
+import { UIHandler } from './ui.js';
+import { TreeRenderer } from './tree.js';
 
-/**
- * Maneja la inicializacion cuando el DOM esta listo.
- * No recibe parametros.
- *
- * @returns {void}
- * Flujo:
- * - Aplica valores por defecto visibles (ej. nota VLSM).
- * - Verifica que exista cada formulario antes de inicializar su UI.
- * - Inicializa el runner de pruebas solo si el boton esta en la pagina.
- * Efectos secundarios: registra listeners y actualiza el DOM.
- */
-function handleDOMContentLoaded() {
-  // Inicializa valores por defecto visibles en la UI (no depende de la pagina).
-  initDefaults();
+document.addEventListener('DOMContentLoaded', async () => {
+    // URL de la API de Google Apps Script conectada a Google Sheets
+    const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbxXQJLrdKa6jsQOI8Fr5O_EVoCk2ODTIKnobDKu1X1K_pqdp2WEbtE3SvApos3mji_N/exec'; 
+    
+    const api = new FamiliaAPI(googleAppsScriptUrl);
+    const tree = new TreeRenderer('tree-network');
+    const ui = new UIHandler(api, tree);
 
-  // Inicializa solo los modulos presentes en la pagina actual.
-  // Esto evita errores cuando un formulario no existe en la pagina.
-  if (document.getElementById("cidr-form")) {
-    initCidrCalculator();
-  }
+    // Carga inicial
+    const initialMembers = await api.getMembers();
 
-  if (document.getElementById("vlsm-form")) {
-    initVlsmCalculator();
-  }
+    tree.onNodeClick = (member) => ui.openInfoModal(member);
 
-  if (document.getElementById("run-tests")) {
-    initTestRunner();
-  }
-}
-
-// Enlaza la inicializacion al evento DOMContentLoaded para asegurar que el DOM este listo.
-document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
+    tree.render(initialMembers);
+});

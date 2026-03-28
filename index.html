@@ -1,235 +1,131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<!--
-  Documento principal de la calculadora CIDR.
-  Esta pagina contiene el formulario, la salida de resultados y la tabla FLSM opcional.
--->
-
 <head>
-  <!-- Metadatos base: codificacion, viewport y descripcion para SEO/accesibilidad -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Calculadora CIDR con validaciones y resultados detallados.">
-  <!-- Titulo de la pestaña del navegador -->
-  <title>Calculadora IP</title>
-  <!-- Favicon y preconexion para optimizar la carga de fuentes externas -->
-  <link rel="icon" type="image/x-icon" href="img/icono.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Hoja de estilos principal (importa los modulos CSS internos) -->
-  <link rel="stylesheet" href="css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árbol Genealógico Familiar</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Custom Canvas Tree Engine (no external dependency) -->
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 </head>
-
 <body>
-  <!-- Contenedor general: header + contenido principal -->
-  <div class="page">
-    <!-- Barra superior con marca, creditos y navegacion global -->
-    <header class="site-header">
-      <!-- Marca: logo + nombre del sistema -->
-      <a href="index.html" class="brand">
-        <img src="img/logo.png" alt="Logo" class="brand-logo">
-        <div class="brand-text">
-          <span class="brand-title">Calculadora IP</span>
-          <span class="brand-subtitle">CIDR + VLSM</span>
-        </div>
-      </a>
-      <!-- Creditos del equipo -->
-      <div class="header-credits">
-        Aguilar Bautista César Fernando<br>Ramos Ortiz Ximena Abigail
-      </div>
-      <!-- Navegacion entre secciones CIDR y VLSM -->
-      <nav class="nav">
-        <a href="index.html" class="active">CIDR</a>
-        <a href="vlsm.html">VLSM</a>
-      </nav>
+    <header>
+        <h1>Árbol Genealógico Familiar</h1>
+        <button id="add-member-btn" class="primary-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+            Añadir Miembro
+        </button>
     </header>
-
+    
     <main>
-      <!-- Seccion CIDR: formulario y resultados -->
-      <section id="cidr" class="section active-section">
-        <!-- Encabezado descriptivo: titulo y breve explicacion de la herramienta -->
-        <div class="section-header">
-          <h2>Calculadora CIDR</h2>
-          <p>Analiza redes IPv4, obtén rangos de hosts, conversiones binarias y genera subredes de longitud fija (FLSM).
-          </p>
-        </div>
-        <!-- Panel del formulario de entrada CIDR -->
-        <div class="panel">
-          <!--
-            Formulario CIDR:
-            - Permite una entrada combinada IP/prefijo o IP + mascara por separado.
-            - Incluye opcion para generar subredes FLSM y mostrar binario.
-          -->
-          <form id="cidr-form" class="form">
-            <div class="form-block">
-              <!-- Entrada combinada IP/prefijo (prioritaria si se llena) -->
-              <label for="cidr-combined">IP con prefijo (opcional)</label>
-              <input id="cidr-combined" name="cidr-combined" type="text" placeholder="192.168.10.0/24"
-                autocomplete="off">
-              <p class="helper">Si usas este campo, no es necesario completar los de abajo.</p>
-            </div>
-
-            <!-- Grupo de campos IP, mascara y subredes -->
-            <div class="form-grid">
-              <div class="form-block">
-                <!-- Entrada de direccion IP separada -->
-                <label for="cidr-ip">Direccion IP</label>
-                <input id="cidr-ip" name="cidr-ip" type="text" placeholder="192.168.10.0" autocomplete="off">
-              </div>
-              <div class="form-block">
-                <!-- Entrada de mascara en prefijo o decimal punteada -->
-                <label for="cidr-mask">Mascara (prefijo o decimal)</label>
-                <input id="cidr-mask" name="cidr-mask" type="text" placeholder="/24 o 255.255.255.0" autocomplete="off">
-              </div>
-              <div class="form-block">
-                <!-- Entrada opcional para cantidad de subredes FLSM -->
-                <label for="cidr-subnets">Subredes (opcional)</label>
-                <input id="cidr-subnets" name="cidr-subnets" type="number" min="1" placeholder="Ej: 4, 8, 256..."
-                  autocomplete="off">
-              </div>
-            </div>
-
-            <!-- Opcion para mostrar resultados en binario -->
-            <label class="check">
-              <input id="cidr-binary-toggle" type="checkbox">
-              Mostrar representacion binaria
-            </label>
-
-            <!-- Acciones principales del formulario -->
-            <div class="form-actions">
-              <button class="btn primary" type="submit">Calcular CIDR</button>
-              <button class="btn ghost" type="button" id="cidr-example">Cargar ejemplo</button>
-              <button class="btn subtle" type="button" id="cidr-clear">Limpiar</button>
-            </div>
-
-            <!-- Contenedor de mensajes de estado para errores/avisos -->
-            <div id="cidr-status" class="status" role="alert" aria-live="polite"></div>
-          </form>
-        </div>
-
-        <!-- Panel de resultados principales CIDR -->
-        <div class="results panel" id="cidr-results" hidden style="margin-top: 24px;">
-          <!-- Encabezado con prefijo resultante -->
-          <div class="results-header">
-            <h3>Resultados CIDR</h3>
-            <span class="chip" id="cidr-prefix-chip">/24</span>
-          </div>
-          <!-- Lista de campos clave del calculo CIDR -->
-          <dl class="result-list">
-            <div class="result-item">
-              <dt>Direccion de red</dt>
-              <dd id="cidr-network">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Rango de hosts</dt>
-              <dd id="cidr-host-range">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Broadcast</dt>
-              <dd id="cidr-broadcast">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Mascara (decimal)</dt>
-              <dd id="cidr-mask-dec">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Mascara (prefijo)</dt>
-              <dd id="cidr-mask-prefix">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Hosts disponibles</dt>
-              <dd id="cidr-hosts">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Total de direcciones</dt>
-              <dd id="cidr-total">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Wildcard</dt>
-              <dd id="cidr-wildcard">-</dd>
-            </div>
-          </dl>
-
-          <!-- Panel plegable con representacion binaria (se muestra si el toggle esta activo) -->
-          <details id="cidr-binary" class="binary" hidden>
-            <summary>Ver representacion binaria</summary>
-            <div class="binary-grid">
-              <div>
-                <span>IP</span>
-                <pre id="cidr-bin-ip"></pre>
-              </div>
-              <div>
-                <span>Mascara</span>
-                <pre id="cidr-bin-mask"></pre>
-              </div>
-              <div>
-                <span>Network</span>
-                <pre id="cidr-bin-network"></pre>
-              </div>
-              <div>
-                <span>Broadcast</span>
-                <pre id="cidr-bin-broadcast"></pre>
-              </div>
-            </div>
-          </details>
-        </div>
-
-
-
-
-
-
-        <!-- Panel de subredes FLSM calculadas (opcional) -->
-        <div class="results panel" id="cidr-subnet-results" hidden style="margin-top: 24px;">
-          <!-- Encabezado del bloque de subredes -->
-          <div class="results-header">
-            <h3>Subredes Generadas</h3>
-            <span class="chip" id="cidr-subnet-count-chip">0</span>
-          </div>
-          <!-- Resumen rapido de nueva mascara y hosts por subred -->
-          <div class="result-list subnet-summary">
-            <div class="result-item">
-              <dt>Nueva Mascara</dt>
-              <dd id="cidr-new-mask">-</dd>
-            </div>
-            <div class="result-item">
-              <dt>Hosts por Subred</dt>
-              <dd id="cidr-subnet-hosts">-</dd>
-            </div>
-          </div>
-
-          <!-- Tabla con el detalle de cada subred generada -->
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>IP Red</th>
-                  <th>IP Inicio</th>
-                  <th>IP Final</th>
-                  <th>IP Broadcast</th>
-                  <th>Host Mask</th>
-                </tr>
-              </thead>
-              <tbody id="cidr-subnet-rows">
-                <!-- Filas generadas dinamicamente por JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Mensaje inicial cuando no hay calculos -->
-        <div class="empty" id="cidr-empty">
-          <p>Ingresa una IP y una mascara para ver resultados.</p>
-        </div>
-      </section>
+        <div id="tree-network"></div>
     </main>
 
+    <!-- Modal Form -->
+    <div id="member-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>Nuevo Miembro</h2>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <form id="member-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre(s) *</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido">Apellido(s) *</label>
+                        <input type="text" id="apellido" name="apellido" required>
+                    </div>
+                </div>
 
-  </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sexo">Sexo *</label>
+                        <select id="sexo" name="sexo" required>
+                            <option value="">Seleccione...</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaNacimiento">Fecha Nacimiento</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+                    </div>
+                </div>
 
-  <!-- Script principal que inicializa la UI y la logica de calculo -->
-  <script type="module" src="js/main.js"></script>
+                <div class="form-row align-items-center">
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="fallecido" name="fallecido">
+                        <label for="fallecido">Fallecido/a</label>
+                    </div>
+
+                    <div class="form-group hidden" id="death-date-group">
+                        <label for="fechaFallecimiento">Fecha de Fallecimiento</label>
+                        <input type="date" id="fechaFallecimiento" name="fechaFallecimiento">
+                    </div>
+                </div>
+
+                <h3>Relaciones (Opcional)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="idPadre">Padre</label>
+                        <select id="idPadre" name="idPadre">
+                            <option value="">Ninguno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="idMadre">Madre</label>
+                        <select id="idMadre" name="idMadre">
+                            <option value="">Ninguna</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="idPareja">Pareja / Cónyuge</label>
+                    <select id="idPareja" name="idPareja">
+                        <option value="">Ninguna</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="save-member-btn" class="primary-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>Detalle del Miembro</h2>
+                <button id="close-info-btn" class="close-btn">&times;</button>
+            </div>
+            <div id="info-content" class="info-content">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
 </body>
-
 </html>
