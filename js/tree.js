@@ -136,6 +136,7 @@ export class TreeRenderer {
             const t = e.touches[0];
             this._dragging = true;
             this._lastMouse = { x: t.clientX, y: t.clientY };
+            this._touchStartPos = { x: t.clientX, y: t.clientY, time: Date.now() };
         } else if (e.touches.length === 2) {
             e.preventDefault();
             this._dragging = false;
@@ -178,6 +179,21 @@ export class TreeRenderer {
     _onTouchEnd(e) {
         this._onMouseUp();
         this._initialPinchDistance = null;
+        
+        // Detectar "tap" para disparar modal de info en celulares
+        if (e.changedTouches && e.changedTouches.length === 1 && this._touchStartPos) {
+            const t = e.changedTouches[0];
+            const dx = t.clientX - this._touchStartPos.x;
+            const dy = t.clientY - this._touchStartPos.y;
+            const dt = Date.now() - this._touchStartPos.time;
+            
+            // Si el dedo casi no se movió y el toque fue veloz (menos de 400ms)
+            if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && dt < 400) {
+                this._onClick({ clientX: t.clientX, clientY: t.clientY });
+            }
+            this._touchStartPos = null;
+        }
+
         if (e.touches.length === 1) {
             const t = e.touches[0];
             this._dragging = true;
