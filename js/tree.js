@@ -51,9 +51,8 @@ export class TreeRenderer {
         this.canvas.addEventListener('wheel', (e) => this._onWheel(e), { passive: false });
         this.canvas.addEventListener('mousedown', (e) => this._onMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this._onMouseMove(e));
-        this.canvas.addEventListener('mouseup', () => this._onMouseUp());
-        this.canvas.addEventListener('mouseleave', () => this._onMouseUp());
-        this.canvas.addEventListener('click', (e) => this._onClick(e));
+        this.canvas.addEventListener('mouseup', (e) => this._onMouseUp(e));
+        this.canvas.addEventListener('mouseleave', (e) => this._onMouseUp(e));
 
         // Touch
         this.canvas.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: false });
@@ -97,6 +96,7 @@ export class TreeRenderer {
     _onMouseDown(e) {
         this._dragging = true;
         this._lastMouse = { x: e.clientX, y: e.clientY };
+        this._clickStartPos = { x: e.clientX, y: e.clientY, time: Date.now() };
         this.canvas.style.cursor = 'grabbing';
     }
 
@@ -125,9 +125,22 @@ export class TreeRenderer {
         }
     }
 
-    _onMouseUp() {
+    _onMouseUp(e) {
         this._dragging = false;
         this.canvas.style.cursor = this._hoveredNode ? 'pointer' : 'grab';
+        
+        // Handle desktop click
+        if (e && this._clickStartPos) {
+            const dx = e.clientX - this._clickStartPos.x;
+            const dy = e.clientY - this._clickStartPos.y;
+            const dt = Date.now() - this._clickStartPos.time;
+            
+            // Allow up to 10px margin of error for dragging during a "click"
+            if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 600) {
+                this._onClick(e.clientX, e.clientY);
+            }
+        }
+        this._clickStartPos = null;
     }
 
     _onTouchStart(e) {
@@ -187,9 +200,9 @@ export class TreeRenderer {
             const dy = t.clientY - this._touchStartPos.y;
             const dt = Date.now() - this._touchStartPos.time;
             
-            // Si el dedo casi no se movió y el toque fue veloz (menos de 400ms)
-            if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && dt < 400) {
-                this._onClick({ clientX: t.clientX, clientY: t.clientY });
+            // Si el dedo casi no se movió y el toque fue veloz
+            if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 600) {
+                this._onClick(t.clientX, t.clientY);
             }
             this._touchStartPos = null;
         }
@@ -201,10 +214,10 @@ export class TreeRenderer {
         }
     }
 
-    _onClick(e) {
+    _onClick(clientX, clientY) {
         if (!this.onNodeClick) return;
         const rect = this.canvas.getBoundingClientRect();
-        const w = this._screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+        const w = this._screenToWorld(clientX - rect.left, clientY - rect.top);
         for (const [id, pos] of this._positions) {
             const hw = this.NODE_W / 2, hh = this.NODE_H / 2;
             if (w.x >= pos.x - hw && w.x <= pos.x + hw && w.y >= pos.y - hh && w.y <= pos.y + hh) {

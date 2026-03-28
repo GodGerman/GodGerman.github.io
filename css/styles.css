@@ -449,6 +449,11 @@ main {
         text-align: center;
     }
 
+    .site-logo {
+        width: 28px;
+        height: 28px;
+    }
+
     .primary-btn {
         width: 100%;
         padding: 0.75rem 1rem;
@@ -483,6 +488,11 @@ main {
     
     header h1 {
         font-size: 1.15rem;
+    }
+
+    .site-logo {
+        width: 24px;
+        height: 24px;
     }
 
     .modal-content {
