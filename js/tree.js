@@ -58,7 +58,8 @@ export class TreeRenderer {
         // Touch
         this.canvas.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: false });
         this.canvas.addEventListener('touchmove', (e) => this._onTouchMove(e), { passive: false });
-        this.canvas.addEventListener('touchend', () => this._onMouseUp());
+        this.canvas.addEventListener('touchend', (e) => this._onTouchEnd(e));
+        this.canvas.addEventListener('touchcancel', (e) => this._onTouchEnd(e));
     }
 
     _resizeCanvas() {
@@ -135,6 +136,19 @@ export class TreeRenderer {
             const t = e.touches[0];
             this._dragging = true;
             this._lastMouse = { x: t.clientX, y: t.clientY };
+        } else if (e.touches.length === 2) {
+            e.preventDefault();
+            this._dragging = false;
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            this._initialPinchDistance = Math.hypot(dx, dy);
+            this._initialScale = this.scale;
+            
+            const rect = this.canvas.getBoundingClientRect();
+            this._pinchCenter = {
+                x: ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left,
+                y: ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top
+            };
         }
     }
 
@@ -146,6 +160,28 @@ export class TreeRenderer {
             this.panY += t.clientY - this._lastMouse.y;
             this._lastMouse = { x: t.clientX, y: t.clientY };
             this._draw();
+        } else if (e.touches.length === 2 && this._initialPinchDistance) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currentDistance = Math.hypot(dx, dy);
+            
+            const newScale = Math.max(0.15, Math.min(3, this._initialScale * (currentDistance / this._initialPinchDistance)));
+            
+            this.panX = this._pinchCenter.x - (this._pinchCenter.x - this.panX) * (newScale / this.scale);
+            this.panY = this._pinchCenter.y - (this._pinchCenter.y - this.panY) * (newScale / this.scale);
+            this.scale = newScale;
+            this._draw();
+        }
+    }
+    
+    _onTouchEnd(e) {
+        this._onMouseUp();
+        this._initialPinchDistance = null;
+        if (e.touches.length === 1) {
+            const t = e.touches[0];
+            this._dragging = true;
+            this._lastMouse = { x: t.clientX, y: t.clientY };
         }
     }
 

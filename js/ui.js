@@ -130,6 +130,12 @@ export class UIHandler {
     }
 
     openModal(member = null) {
+        // Limpiar errores visuales previos
+        document.getElementById('nombre')?.classList.remove('error');
+        document.getElementById('sexo')?.classList.remove('error');
+        document.getElementById('error-nombre')?.classList.remove('visible');
+        document.getElementById('error-sexo')?.classList.remove('visible');
+
         this._editingMember = member;
         this.form.reset();
         this.dpNacimiento.clear();
@@ -180,10 +186,37 @@ export class UIHandler {
     }
 
     async handleFormSubmit() {
+        const nombreInput = document.getElementById('nombre');
+        const sexoInput = document.getElementById('sexo');
+        const errorNombre = document.getElementById('error-nombre');
+        const errorSexo = document.getElementById('error-sexo');
+
+        let isValid = true;
+
+        if (!nombreInput.value.trim()) {
+            nombreInput.classList.add('error');
+            if (errorNombre) errorNombre.classList.add('visible');
+            isValid = false;
+        } else {
+            nombreInput.classList.remove('error');
+            if (errorNombre) errorNombre.classList.remove('visible');
+        }
+
+        if (!sexoInput.value) {
+            sexoInput.classList.add('error');
+            if (errorSexo) errorSexo.classList.add('visible');
+            isValid = false;
+        } else {
+            sexoInput.classList.remove('error');
+            if (errorSexo) errorSexo.classList.remove('visible');
+        }
+
+        if (!isValid) return;
+
         const formData = new FormData(this.form);
         const memberData = {
-            nombre: formData.get('nombre'),
-            apellido: formData.get('apellido'),
+            nombre: (formData.get('nombre') || '').trim(),
+            apellido: (formData.get('apellido') || '').trim(),
             sexo: formData.get('sexo'),
             fechaNacimiento: formData.get('fechaNacimiento') || null,
             fallecido: this.fallecidoCheckbox.checked,
@@ -204,6 +237,48 @@ export class UIHandler {
         }
 
         if (result.success) {
+            // Sincronización relacional de la pareja (bidireccional)
+            let finalMemberId = this._editingMember ? this._editingMember.id : null;
+            if (!finalMemberId) {
+                finalMemberId = result.id || (result.data && result.data.id) || (result.user && result.user.id);
+            }
+            if (!finalMemberId) {
+                // Caída libre si la API real no devulve el objeto explícito:
+                // Buscamos desde atrás (el más reciente) el cual coincida, o al menos el que tenga el mayor ID
+                const addedUser = [...this.api.members].reverse().find(m => 
+                    m.nombre === memberData.nombre && m.apellido === memberData.apellido
+                );
+                if (addedUser) finalMemberId = addedUser.id;
+            }
+
+            const newParejaId = memberData.idPareja;
+
+            if (finalMemberId) {
+                // Convertir explícitamente a String para evitar fallos de ==
+                const fid = String(finalMemberId);
+                // Si estamos editando y se cambió/quitó la pareja, limpiar al cónyuge anterior
+                if (this._editingMember && this._editingMember.idPareja !== newParejaId) {
+                    if (this._editingMember.idPareja) {
+                        const oldSpouse = this.api.members.find(m => m.id === this._editingMember.idPareja);
+                        if (oldSpouse) {
+                            await this.api.updateMember({ ...oldSpouse, idPareja: null });
+                        }
+                    }
+                }
+
+                // Asignar al nuevo cónyuge (si es miembro nuevo con pareja o se acaba de cambiar en edición)
+                if (newParejaId && (!this._editingMember || String(this._editingMember.idPareja) !== String(newParejaId))) {
+                    const newSpouse = this.api.members.find(m => String(m.id) === String(newParejaId));
+                    if (newSpouse) {
+                        try {
+                            await this.api.updateMember({ ...newSpouse, idPareja: fid });
+                        } catch(e) {
+                            console.error("Error al sincronizar nueva pareja", e);
+                        }
+                    }
+                }
+            }
+
             this.closeModal();
             this.treeRenderer.render(this.api.members);
         }
