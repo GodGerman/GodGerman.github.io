@@ -48,18 +48,47 @@ export class UIHandler {
             }
         });
 
-        // Initialize flatpickr on date inputs
-        this.dpNacimiento = flatpickr("#fechaNacimiento", {
+        // Initialize flatpickr on date inputs with proper ID/Name assignment for accessibility (Lighthouse form errors)
+        const datepickerConfig = (inputId) => ({
             locale: "es",
             dateFormat: "Y-m-d",
-            allowInput: true
+            altInput: true,
+            altFormat: "j \\d\\e F \\d\\e Y",
+            allowInput: true,
+            onReady: function(selectedDates, dateStr, instance) {
+                const baseId = inputId.replace('#', '');
+                let targetId = null;
+                
+                if (instance.mobileInput) {
+                    targetId = "mob_" + baseId;
+                    instance.mobileInput.setAttribute("id", targetId);
+                    instance.mobileInput.setAttribute("name", targetId);
+                }
+                
+                if (instance.altInput) {
+                    const altId = "alt_" + baseId;
+                    instance.altInput.setAttribute("id", altId);
+                    instance.altInput.setAttribute("name", altId);
+                    if (!targetId) targetId = altId;
+                }
+                
+                // Fix label correctly mapping to the visible generated input
+                if (targetId) {
+                    const label = document.querySelector(`label[for="${baseId}"]`);
+                    if (label) label.setAttribute("for", targetId);
+                }
+                
+                // Fix calendar year component inputs
+                const yearInput = instance.calendarContainer ? instance.calendarContainer.querySelector(".numInput.cur-year") : null;
+                if (yearInput) {
+                    yearInput.setAttribute("id", "year_" + baseId);
+                    yearInput.setAttribute("name", "year_" + baseId);
+                }
+            }
         });
-        
-        this.dpFallecimiento = flatpickr("#fechaFallecimiento", {
-            locale: "es",
-            dateFormat: "Y-m-d",
-            allowInput: true
-        });
+
+        this.dpNacimiento = flatpickr("#fechaNacimiento", datepickerConfig("#fechaNacimiento"));
+        this.dpFallecimiento = flatpickr("#fechaFallecimiento", datepickerConfig("#fechaFallecimiento"));
 
         this.fallecidoCheckbox.addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -289,13 +318,20 @@ export class UIHandler {
     }
 
     /**
-     * Convierte una fecha de yyyy-mm-dd a dd/mm/yyyy para mostrar al usuario.
+     * Convierte una fecha de yyyy-mm-dd a formato "dd de Mes de yyyy".
      */
     formatDate(dateStr) {
         if (!dateStr) return 'Desconocida';
         const parts = dateStr.split('-');
         if (parts.length !== 3) return dateStr;
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        const meses = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+        const day = parseInt(parts[2], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parts[0];
+        return `${day} de ${meses[month]} de ${year}`;
     }
 
     calcularDetalles(m) {

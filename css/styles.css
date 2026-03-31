@@ -105,8 +105,9 @@ main {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
     background-color: rgba(15, 23, 42, 0.4);
     z-index: 50;
     display: flex;
@@ -135,7 +136,7 @@ main {
     width: 100%;
     max-width: 500px;
     padding: 1.5rem 2rem;
-    max-height: 90vh;
+    max-height: 100%;
     overflow-y: auto;
     position: relative;
     transform: translateY(0);
@@ -475,7 +476,7 @@ main {
 
     .modal-content {
         padding: 1.5rem 1.25rem;
-        max-width: 90%;
+        max-width: 100%;
     }
 }
 
@@ -497,7 +498,7 @@ main {
 
     .modal-content {
         padding: 1.25rem 1rem;
-        max-width: 95%;
+        max-width: 100%;
         border-radius: 10px;
     }
 
